@@ -1,0 +1,14 @@
+import FaqsWithDivider from "@/nextui/FaqsWithDivider";
+import prisma from "@/prisma/client";
+import { auth } from "@/auth";
+import { notFound, redirect } from "next/navigation";
+
+export const revalidate = 60 * 5; // 5 minutes
+
+export default async function Component() {
+	const faqs = await prisma.faq.findMany({ orderBy: { index: "asc" } });
+	if (!faqs.length) {
+		return redirect("/");
+	}
+	return <FaqsWithDivider desktopTitle={<>About The English School Student Elections</>} mobileTitle="About the Elections" faqs={faqs} />;
+}

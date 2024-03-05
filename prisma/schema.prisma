@@ -1,0 +1,89 @@
+datasource db {
+   provider = "postgresql"
+   url      = env("DATABASE_URL")
+}
+
+generator client {
+   provider = "prisma-client-js"
+}
+
+model Faq {
+   id      String @id @unique @default(uuid())
+   title   String
+   content String
+   index   Int?
+}
+
+model Election {
+   id                String      @id @unique @default(uuid())
+   election_year     String      @unique
+   is_current        Boolean     @default(false)
+   forceEnabled      Boolean     @default(false)
+   autoEnabled       Boolean     @default(true)
+   description       String?
+   voting_start_date DateTime?
+   voting_end_date   DateTime?
+   publish_results   Boolean     @default(false)
+   is_visible        Boolean     @default(false)
+   Candidate         Candidate[]
+}
+
+model Candidate {
+   id              String          @id @unique @default(uuid())
+   officialName    String
+   officialSurname String
+   slug            String?
+   type            CandidateType
+   //
+   student_id      String?
+   //
+   bio             String?
+   slogan          String?
+   //
+   instagram       String?
+   facebook        String?
+   twitter         String?
+   bereal          String?
+   snapchat        String?
+   website         String?
+   youtube         String?
+   //
+   video_url       String?
+   photo           String?
+   file            String?
+   //
+   election        Election        @relation(fields: [election_id], references: [id])
+   election_id     String
+   ProfileViewer   ProfileViewer[]
+   Vote            Vote[]
+
+   @@unique([election_id, student_id])
+   @@unique([election_id, slug])
+}
+
+model Admin {
+   id       String @id @unique @default(uuid())
+   fullName String
+   email    String @unique
+   password String
+}
+
+model Vote {
+   id          String    @id @unique @default(uuid())
+   student_id  String
+   Candidate   Candidate @relation(fields: [candidateId], references: [id])
+   candidateId String
+
+   @@unique([student_id, candidateId])
+}
+
+model ProfileViewer {
+   id           Int        @id @unique @default(autoincrement())
+   Candidate    Candidate? @relation(fields: [candidate_id], references: [id])
+   candidate_id String?
+}
+
+enum CandidateType {
+   BOY
+   GIRL
+}
