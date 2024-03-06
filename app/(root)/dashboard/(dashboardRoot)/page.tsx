@@ -33,17 +33,26 @@ export default async function Component({ searchParams }) {
 		<>
 			<AddElectionModal />
 			<ul className="w-full grid gap-4">
-				{elections.map((election) => (
-					<li key={election.id} className="w-full bg-content1/60 p-4 flex rounded-xl border">
-						<div className="flex flex-col gap-1">
-							<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{election.election_year} Elections</p>
-							<h1 className="text-default-400 mt-1">{election._count.Candidate} Candidates, held on March 9</h1>
-						</div>
-						<Button endContent={<Icon icon="solar:arrow-right-outline" width={20} />} as={Link} href={`/dashboard/${election.election_year || election.id}`} fullWidth className="border-small my-auto ml-auto border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto">
-							Manage
-						</Button>
-					</li>
-				))}
+				{elections.map((election) => {
+					//endDay in form March 9
+					const endDay = new Date(election.voting_end_date).toLocaleDateString("en-US", {
+						month: "long",
+						day: "numeric",
+					});
+					return (
+						<li key={election.id} className="w-full bg-content1/60 p-4 flex rounded-xl border">
+							<div className="flex flex-col gap-1">
+								<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{election.election_year} Elections</p>
+								<h1 className="text-default-400 mt-1">
+									{election._count.Candidate} Candidates • {endDay}
+								</h1>
+							</div>
+							<Button endContent={<Icon icon="solar:arrow-right-outline" width={20} />} as={Link} href={`/dashboard/${election.election_year || election.id}`} fullWidth className="border-small my-auto ml-auto border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto">
+								Manage
+							</Button>
+						</li>
+					);
+				})}
 			</ul>
 		</>
 	);

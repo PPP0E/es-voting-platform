@@ -23,7 +23,7 @@ export default async function Component({ searchParams }) {
 					{faqs.map((faq, index) => (
 						<li key={index} className="w-full flex-col gap-2 bg-content1/60 p-4 flex md:flex-row rounded-xl border">
 							<div className="flex flex-col gap-1">
-								<div className="flex gap-2">
+								<div className="flex gap-2 flex-col md:flex-row">
 									<Chip color="primary" className="rounded-lg">
 										{faq.index + 1}
 									</Chip>

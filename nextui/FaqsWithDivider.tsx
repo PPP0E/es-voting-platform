@@ -13,11 +13,11 @@ export default function Component({ faqs, desktopTitle, mobileTitle }) {
 					<span className="inline-block md:hidden">{mobileTitle}</span>
 					<span className="hidden md:inline-block">{desktopTitle}</span>
 				</h2>
-				<div>
+				{/* 				<div>
 					<Button disableAnimation className="bg-gradient-to-br from-foreground to-foreground-600 font-medium text-background" endContent={<Icon icon="lucide:chevron-right" width={24} />} size="lg" variant="shadow">
 						Contact Us
 					</Button>
-				</div>
+				</div> */}
 				<Accordion
 					fullWidth
 					keepContentMounted

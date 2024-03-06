@@ -11,7 +11,7 @@ import Icon from "@/components/ui/Icon";
 export default function Component({ election, hideDescription = false, hideButtons = false }) {
 	return (
 		<>
-			<section className="flex max-w-5xl flex-col mx-auto items-center py-24 px-4">
+			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto items-center py-24 px-4">
 				<div className="flex max-w-xl flex-col text-center">
 					{!!election.Candidate.length && (
 						<>
@@ -31,10 +31,10 @@ export default function Component({ election, hideDescription = false, hideButto
 					{!hideButtons && !!election.Candidate.length && (
 						<div className="flex w-full justify-center gap-2">
 							<Button as={Link} href={`/elections/${"2024"}`} variant="ghost">
-								About 2024 Elections
+								2024 Elections
 							</Button>
 							<Button as={Link} href="/elections" color="secondary">
-								Explore Past Elections
+								Past Elections
 							</Button>
 						</div>
 					)}
@@ -54,10 +54,10 @@ export default function Component({ election, hideDescription = false, hideButto
 				)}
 			</section>
 			{election.Candidate.length && (
-				<div className="mb-20 flex">
+				<div className="mb-20 pwa:hidden flex">
 					<div className="text-tiny md:hover:bg-white md:hover:text-black duration-300 cursor-pointer bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
 						<Icon icon="material-symbols:info" width={24} />
-						<p className="my-auto ml-2">Candidates are randomly shuffled</p>
+						<p className="my-auto ml-2">Candidates are randomly shuffled every time</p>
 					</div>
 				</div>
 			)}

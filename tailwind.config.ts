@@ -18,6 +18,9 @@ const config = {
 			},
 		},
 		extend: {
+			screens: {
+				pwa: { raw: "(display-mode: standalone)" },
+			},
 			colors: {
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",

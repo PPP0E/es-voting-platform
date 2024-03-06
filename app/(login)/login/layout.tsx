@@ -14,6 +14,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en" className="bg-white">
+			<head>
+				<link rel="apple-touch-startup-image" href="/app-loader.png"></link>
+			</head>
 			<body className={inter.className}>
 				<NextUIProvider>
 					{children}

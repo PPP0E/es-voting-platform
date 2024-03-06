@@ -70,7 +70,7 @@ export default function Component() {
 	const currentYear = new Date().getFullYear();
 	return (
 		<>
-			<div className="p-3 w-full opacity-0 absolute">
+			<div className="p-3 w-full pwa:hidden opacity-0 absolute">
 				<div className="flex w-full rounded-xl flex-col">
 					{" "}
 					<div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-center px-6 py-12 lg:px-8">
@@ -101,7 +101,7 @@ export default function Component() {
 					</div>
 				</div>
 			</div>
-			<footer className="p-3 fixed w-full z-[-2] bottom-0">
+			<footer className="p-3 fixed pwa:hidden w-full z-[-2] bottom-0">
 				<div className="flex w-full flex-col">
 					<div className="mx-auto flex w-full max-w-7xl rounded-xl flex-col items-center justify-center px-6 py-12 lg:px-8">
 						<div className="flex items-center justify-center">

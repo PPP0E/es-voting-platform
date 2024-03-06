@@ -28,6 +28,9 @@ export default auth((req) => {
 	if (nextUrl.pathname === "/login" && isAuthenticated) {
 		return NextResponse.redirect(new URL("/", nextUrl.origin));
 	}
+	if (nextUrl.pathname.includes("/dashboard") && !isAuthenticated) {
+		return NextResponse.redirect(new URL("/login", nextUrl.origin));
+	}
 });
 
 /* export const config = {

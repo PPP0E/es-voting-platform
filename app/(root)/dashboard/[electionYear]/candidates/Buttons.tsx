@@ -2,7 +2,6 @@
 
 import { Button } from "@nextui-org/button";
 import Icon from "@/components/ui/Icon";
-import { moveDown, moveUp, deleteFaq } from "./actions";
 import { startTransition, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateSearchParams } from "@/lib/searchParams";
@@ -42,22 +41,8 @@ export function MoveDownButton({ index, length, id }) {
 }
 
 export function DeleteButton({ id }) {
-	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	async function deleteFaqHandler() {
-		flushSync(() => {
-			setIsLoading(true);
-		});
-		const res = await deleteFaq(id);
-		setIsLoading(false);
-		if (!res?.ok) {
-			toast.error(res?.message);
-			return;
-		}
-		toast.success(res.message);
-		router.refresh();
-	}
-	return <Button isIconOnly onPress={deleteFaqHandler} isDisabled={isLoading} endContent={<Icon className="" icon="solar:trash-bin-trash-outline" width={22} />} fullWidth className="border-small border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto"></Button>;
+	return <Button isIconOnly onPress={() => updateSearchParams({ delete: id }, router)} endContent={<Icon className="" icon="solar:trash-bin-trash-outline" width={22} />} fullWidth className="border-small border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto"></Button>;
 }
 
 export function EditButton({ id }) {

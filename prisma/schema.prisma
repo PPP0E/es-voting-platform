@@ -20,6 +20,8 @@ model Election {
    is_current        Boolean     @default(false)
    forceEnabled      Boolean     @default(false)
    autoEnabled       Boolean     @default(true)
+   blocked           Boolean     @default(false)
+   total_voters      Int?
    description       String?
    voting_start_date DateTime?
    voting_end_date   DateTime?

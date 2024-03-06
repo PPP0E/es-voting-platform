@@ -6,8 +6,11 @@ import { DeleteButton, EditButton, MoveDownButton, MoveUpButton } from "./Button
 import { ButtonGroup } from "@nextui-org/button";
 import { Avatar } from "@nextui-org/avatar";
 import { isVotingRunning } from "@/lib/isVotingRunning";
+import AddModal from "./AddModal";
+import DeleteModal from "./DeleteModal";
+import EditModal from "./EditModal";
 
-export default async function Component({ params }) {
+export default async function Component({ params, searchParams }) {
 	const { electionYear } = params;
 	let selectedElection = await prisma.election.findFirst({
 		where: {
@@ -21,6 +24,7 @@ export default async function Component({ params }) {
 				select: {
 					officialName: true,
 					officialSurname: true,
+					student_id: true,
 					type: true,
 					photo: true,
 					slogan: true,
@@ -38,13 +42,16 @@ export default async function Component({ params }) {
 		},
 	});
 
+	const selectedEditCandidate = selectedElection.Candidate.find((candidate) => candidate.id === searchParams.edit);
+
 	const votingRunning = isVotingRunning(selectedElection);
-	console.log(votingRunning);
 
-	//refresh every 5 minutes if voting is running
-
+	console.log(selectedEditCandidate);
 	return (
 		<>
+			<AddModal selectedElectionYear={selectedElection.election_year} />
+			<EditModal candidate={selectedEditCandidate} />
+			<DeleteModal />
 			<div>
 				<ul className="w-full grid gap-4">
 					{selectedElection.Candidate.map((candidate, index) => {
@@ -63,7 +70,7 @@ export default async function Component({ params }) {
 								</div>
 								<div className="flex gap-2 ml-auto my-auto">
 									<EditButton id={candidate.id} />
-									<DeleteButton id={candidate.id} />
+									{!selectedElection.blocked && !votingRunning && <DeleteButton id={candidate.id} />}
 								</div>
 							</li>
 						);
@@ -71,9 +78,9 @@ export default async function Component({ params }) {
 				</ul>
 				{!selectedElection.Candidate.length && (
 					<div className="flex flex-col text-center gap-4 p-4 bg-neutral-200/15 rounded-xl border max-w-max mx-auto px-10 border-divider">
-						<p>No FAQs found</p>
-						<Link href="/dashboard/faqs?add" className="mx-auto" showAnchorIcon>
-							Add a FAQ
+						<p>No Candidates Found</p>
+						<Link href={`/dashboard/${selectedElection.election_year}/candidates?add`} className="mx-auto" showAnchorIcon>
+							Add a Candidate
 						</Link>
 					</div>
 				)}
