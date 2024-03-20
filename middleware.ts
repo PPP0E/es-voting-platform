@@ -26,7 +26,7 @@ const { auth } = NextAuth({
 	},
 	providers: [],
 	logger: {
-		error: console.error,
+		error: () => {},
 		warn: console.warn,
 		debug: console.log,
 	},
@@ -35,7 +35,6 @@ const { auth } = NextAuth({
 export default auth((req) => {
 	const { nextUrl } = req;
 	const isAuthenticated = !!req.auth;
-	console.log(req.auth);
 
 	if (nextUrl.pathname === "/login" && isAuthenticated) {
 		return NextResponse.redirect(new URL("/", nextUrl.origin));

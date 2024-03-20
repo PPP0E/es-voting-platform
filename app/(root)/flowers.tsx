@@ -1,6 +1,5 @@
 import Image from "next/image";
 import TopFlowerPic from "@/public/assets/topflower.png";
-import BottomFlowerPic from "@/public/assets/bottomflower.png";
 
 import { auth } from "@/auth";
 

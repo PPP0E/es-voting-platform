@@ -6,6 +6,13 @@ export default async function Component({ params }) {
 		where: {
 			election_year: params.electionYear,
 		},
+		include: {
+			_count: {
+				select: {
+					Candidate: true,
+				},
+			},
+		},
 	});
 
 	return <SettingsForm selectedElection={selectedElection} />;

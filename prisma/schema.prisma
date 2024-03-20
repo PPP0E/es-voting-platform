@@ -20,7 +20,7 @@ model Election {
    election_year      String      @unique
    is_current         Boolean     @default(false)
    forceEnabled       Boolean     @default(false)
-   autoEnabled        Boolean     @default(true)
+   autoEnabled        Boolean     @default(false)
    blocked            Boolean     @default(false)
    total_voters       Int?
    description        String?

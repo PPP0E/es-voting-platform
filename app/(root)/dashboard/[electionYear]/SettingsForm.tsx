@@ -11,8 +11,9 @@ import { Select, SelectSection, SelectItem } from "@nextui-org/select";
 import { isVotingRunning } from "@/lib/isVotingRunning";
 import { useDebouncedValue } from "@mantine/hooks";
 import { toast } from "sonner";
+import type { Election } from "@prisma/client";
 
-export default function Component({ selectedElection }) {
+export default function Component({ selectedElection }: { selectedElection: Election }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -213,6 +214,8 @@ export default function Component({ selectedElection }) {
 		);
 	}
 
+	const numberOfCandidates = selectedElection._count.Candidate;
+
 	return (
 		<>
 			<Modal
@@ -343,6 +346,15 @@ export default function Component({ selectedElection }) {
 						</div>
 						<Button isDisabled={isElectionRunning} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto" color="danger">
 							{isElectionRunning ? "Election Currently Running" : "Delete"}
+						</Button>
+					</div>
+					<div className="w-full bg-red-800/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border-neutral-500 border">
+						<div className="flex flex-col my-auto">
+							<p className="text-medium">Delete Election</p>
+							<p className="text-small text-default-500">Deletes the whole election, requires all candidates to be deleted.</p>
+						</div>
+						<Button color="primary" isDisabled={isElectionRunning || !!numberOfCandidates} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto">
+							{isElectionRunning || !!numberOfCandidates ? "Election Currently Can't Be Deleted" : "Delete"}
 						</Button>
 					</div>
 				</form>
