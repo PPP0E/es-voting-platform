@@ -1,9 +1,7 @@
 import BasicTeamPage from "@/nextui/BasicTeamPage";
 import prisma from "@/prisma/client";
-import { Spacer } from "@nextui-org/react";
-import { Button } from "@nextui-org/button";
-import Link from "next/link";
-import TeamMemberCard from "@/nextui/team-member-card";
+
+export const revalidate = 60;
 
 export default async function Home() {
 	let currentElection = await prisma.election.findFirst({
@@ -40,8 +38,10 @@ export default async function Home() {
 		},
 	});
 
-	const shuffledCandidates = currentElection.Candidate.sort(() => Math.random() - 0.5);
-	currentElection.Candidate = shuffledCandidates;
+	if (!!currentElection?.Candidate.length) {
+		const shuffledCandidates = currentElection.Candidate.sort(() => Math.random() - 0.5);
+		currentElection.Candidate = shuffledCandidates;
+	}
 
 	return <BasicTeamPage election={currentElection} />;
 }

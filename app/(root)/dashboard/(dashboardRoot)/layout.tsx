@@ -3,6 +3,8 @@ import Navbar from "./Navbar";
 import { Spacer } from "@nextui-org/react";
 import prisma from "@/prisma/client";
 
+export const dynamic = "force-dynamic";
+
 export default async function Component({ children }) {
 	return (
 		<main className="mt-6 flex w-full flex-col items-center">

@@ -7,6 +7,8 @@ import { redirect } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function Component({ children, params }) {
 	const selectedElection = await prisma.election.findFirst({
 		where: {

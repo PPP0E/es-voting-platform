@@ -8,8 +8,10 @@ import { Link as NextUILink } from "@nextui-org/link";
 import TeamMemberCard from "./team-member-card";
 import Icon from "@/components/ui/Icon";
 import Confetti from "@/components/ui/confetti";
+import { redirect } from "next/navigation";
 
 export default function Component({ election, hideDescription = false, hideButtons = false }) {
+	if (!election) redirect("/elections");
 	return (
 		<>
 			{election.publish_results && <Confetti />}
@@ -41,11 +43,13 @@ export default function Component({ election, hideDescription = false, hideButto
 						</div>
 					)}
 				</div>
-				<div className="mt-12 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-					{election.Candidate.map((member, index) => (
-						<TeamMemberCard electionYear={election.election_year} index={index} key={index} {...member} />
-					))}
-				</div>
+				{!!election.Candidate.length && (
+					<div className="mt-12 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+						{election.Candidate.map((member, index) => (
+							<TeamMemberCard electionYear={election.election_year} index={index} key={index} {...member} />
+						))}
+					</div>
+				)}
 				{!election.Candidate.length && (
 					<div className="flex flex-col text-center gap-4 p-4 bg-neutral-200/15 rounded-xl border border-divider">
 						<p>No Candidates Registered in the {election.election_year} Elections</p>
