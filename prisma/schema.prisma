@@ -15,23 +15,53 @@ model Faq {
 }
 
 model Election {
-   id                String      @id @unique @default(uuid())
-   election_year     String      @unique
-   is_current        Boolean     @default(false)
-   forceEnabled      Boolean     @default(false)
-   autoEnabled       Boolean     @default(true)
-   blocked           Boolean     @default(false)
-   total_voters      Int?
-   description       String?
-   voting_start_date DateTime?
-   voting_end_date   DateTime?
-   publish_results   Boolean     @default(false)
-   is_visible        Boolean     @default(false)
-   Candidate         Candidate[]
+   id                 String      @id @unique @default(uuid())
+   election_date      String?
+   election_year      String      @unique
+   is_current         Boolean     @default(false)
+   forceEnabled       Boolean     @default(false)
+   autoEnabled        Boolean     @default(true)
+   blocked            Boolean     @default(false)
+   total_voters       Int?
+   description        String?
+   voting_start_time  String?
+   voting_end_time    String?
+   publish_results    Boolean     @default(false)
+   is_visible         Boolean     @default(false)
+   //
+   edit_bio           Boolean     @default(true)
+   edit_slogan        Boolean     @default(true)
+   edit_socials       Boolean     @default(true) //includes social media and video; speech is added by admin
+   edit_photo         Boolean     @default(true)
+   edit_questions     Boolean     @default(true)
+   //
+   candidates_visible Boolean     @default(false)
+   //
+   Candidate          Candidate[]
+   Question           Question[]
+}
+
+model Question {
+   id          String   @id @unique @default(uuid())
+   title       String
+   content     String
+   election    Election @relation(fields: [election_id], references: [id])
+   election_id String
+   index       Int?
+   Answer      Answer[]
+}
+
+model Answer {
+   id          String    @id @unique @default(uuid())
+   content     String
+   question    Question  @relation(fields: [questionId], references: [id])
+   questionId  String
+   candidate   Candidate @relation(fields: [candidateId], references: [id])
+   candidateId String
 }
 
 model Candidate {
-   id              String          @id @unique @default(uuid())
+   id              String        @id @unique @default(uuid())
    officialName    String
    officialSurname String
    slug            String?
@@ -51,13 +81,16 @@ model Candidate {
    youtube         String?
    //
    video_url       String?
+   speech_url      String?
    photo           String?
    file            String?
    //
-   election        Election        @relation(fields: [election_id], references: [id])
+   views           Int           @default(0)
+   //
+   election        Election      @relation(fields: [election_id], references: [id])
    election_id     String
-   ProfileViewer   ProfileViewer[]
    Vote            Vote[]
+   Answer          Answer[]
 
    @@unique([election_id, student_id])
    @@unique([election_id, slug])
@@ -75,14 +108,9 @@ model Vote {
    student_id  String
    Candidate   Candidate @relation(fields: [candidateId], references: [id])
    candidateId String
+   time        DateTime  @default(now())
 
    @@unique([student_id, candidateId])
-}
-
-model ProfileViewer {
-   id           Int        @id @unique @default(autoincrement())
-   Candidate    Candidate? @relation(fields: [candidate_id], references: [id])
-   candidate_id String?
 }
 
 enum CandidateType {

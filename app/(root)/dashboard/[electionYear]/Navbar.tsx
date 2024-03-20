@@ -11,9 +11,12 @@ export default function Component({ electionYear }) {
 	const basePath = `/dashboard/${electionYear}`;
 	const items = [
 		{ title: "General Settings", href: basePath },
-		{ title: "Candidates", href: `${basePath}/candidates` },
 		{ title: "Voting Results", href: `${basePath}/results` },
-		{ title: "User Exceptions", href: `${basePath}/users` },
+		{ title: "Candidates", href: `${basePath}/candidates` },
+		{ title: "Application Questions", href: `${basePath}/questions` },
+
+		/* 		{ title: "User Exceptions", href: `${basePath}/users` },
+		 */
 	];
 	return (
 		<ScrollShadow hideScrollBar className="-mx-2 flex w-full justify-between gap-8" orientation="horizontal">

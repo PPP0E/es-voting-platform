@@ -9,6 +9,8 @@ import { isVotingRunning } from "@/lib/isVotingRunning";
 import AddModal from "./AddModal";
 import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
+import { Button } from "@nextui-org/button";
+import Icon from "@/components/ui/Icon";
 
 export default async function Component({ params, searchParams }) {
 	const { electionYear } = params;
@@ -25,6 +27,8 @@ export default async function Component({ params, searchParams }) {
 					officialName: true,
 					officialSurname: true,
 					student_id: true,
+					video_url: true,
+					speech_url: true,
 					type: true,
 					photo: true,
 					slogan: true,
@@ -32,6 +36,7 @@ export default async function Component({ params, searchParams }) {
 					facebook: true,
 					twitter: true,
 					bereal: true,
+					bio: true,
 					snapchat: true,
 					website: true,
 					youtube: true,
@@ -46,10 +51,9 @@ export default async function Component({ params, searchParams }) {
 
 	const votingRunning = isVotingRunning(selectedElection);
 
-	console.log(selectedEditCandidate);
 	return (
 		<>
-			<AddModal selectedElectionYear={selectedElection.election_year} />
+			<AddModal isBlocked={selectedElection.blocked} selectedElectionYear={selectedElection.election_year} />
 			<EditModal candidate={selectedEditCandidate} />
 			<DeleteModal />
 			<div>
@@ -60,7 +64,7 @@ export default async function Component({ params, searchParams }) {
 						return (
 							<li key={index} className="w-full flex-col gap-2 bg-content1/60 p-4 flex md:flex-row rounded-xl border">
 								<div className="flex">
-									<Avatar isBordered className="my-auto mr-4 ml-1" src="" />
+									<Avatar isBordered className="my-auto mr-4 ml-1" showFallback src={`/api/users/${candidate.id}/avatar`} />
 									<div className="flex flex-col gap-1">
 										<div className="flex gap-2">
 											<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{fullName}</p>
@@ -69,6 +73,7 @@ export default async function Component({ params, searchParams }) {
 									</div>
 								</div>
 								<div className="flex gap-2 ml-auto my-auto">
+									<Button as={Link} href={`/elections/${electionYear}/candidates/${candidate.slug || candidate.id}`} isIconOnly endContent={<Icon className="" icon="solar:user-outline" width={22} />} fullWidth className="border-small border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto"></Button>
 									<EditButton id={candidate.id} />
 									{!selectedElection.blocked && !votingRunning && <DeleteButton id={candidate.id} />}
 								</div>

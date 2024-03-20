@@ -13,6 +13,16 @@ const { auth } = NextAuth({
 			const isAuthenticated = !!auth?.user;
 			return isAuthenticated;
 		},
+		async jwt({ token, user, trigger }) {
+			if (user) {
+				token.user = user;
+			}
+			return token;
+		},
+		async session({ session, token }) {
+			session.user = token.user;
+			return session;
+		},
 	},
 	providers: [],
 	logger: {
@@ -28,11 +38,11 @@ export default auth((req) => {
 	if (nextUrl.pathname === "/login" && isAuthenticated) {
 		return NextResponse.redirect(new URL("/", nextUrl.origin));
 	}
-	if (nextUrl.pathname.includes("/dashboard") && !isAuthenticated) {
+	if (nextUrl.pathname.includes("/dashboard") && (!isAuthenticated || !req.auth.user.admin)) {
 		return NextResponse.redirect(new URL("/login", nextUrl.origin));
 	}
 });
 
-/* export const config = {
+export const config = {
 	matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-}; */
+};

@@ -21,7 +21,6 @@ export default function Component({ faq }) {
 		});
 		formData.append("id", faq?.id);
 		const res = await editFaq(formData);
-		console.log(res);
 		if (!res?.ok) {
 			toast.error(res?.message);
 			setIsLoading(false);

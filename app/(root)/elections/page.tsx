@@ -10,16 +10,10 @@ export const revalidate = 60 * 5; // 5 minutes
 
 function formatDate(dateString) {
 	const date = new Date(dateString);
-
-	let day = date.getDate().toString();
-	let month = (date.getMonth() + 1).toString(); // getMonth() returns month from 0 to 11
-	let year = date.getFullYear().toString();
-
-	// Add leading zero if day or month is a single digit
-	day = day.length < 2 ? "0" + day : day;
-	month = month.length < 2 ? "0" + month : month;
-
-	return `${day}/${month}/${year}`;
+	const formatted = date.toLocaleDateString();
+	if (formatted == "Invalid Date") return "01/01/1970";
+	if (formatted == "1/1/1970") return "01/01/1970";
+	return formatted;
 }
 
 export default async function Component({ params }) {
@@ -33,7 +27,7 @@ export default async function Component({ params }) {
 			</div>
 			<ul className="mt-12 grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 				{elections.map((election) => {
-					const date = formatDate(election.voting_end_date);
+					const date = formatDate(election.election_date);
 					const printDate = date != "01/01/1970" ? ` • ${date}` : "";
 					const candidateS = election.Candidate.length > 1 || !election.Candidate.length ? "s" : "";
 					const candidateCount = election.Candidate.length;

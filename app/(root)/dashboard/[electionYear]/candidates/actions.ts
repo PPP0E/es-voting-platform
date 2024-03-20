@@ -4,6 +4,10 @@ import { isVotingRunning } from "@/lib/isVotingRunning";
 import { nameCase } from "@/lib/nameCase";
 import prisma from "@/prisma/client";
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
+import { processSlogan, processBio, processSocialMediaLink, processVideoUrl, processSlug } from "@/lib/textOperations";
+import { minio } from "@/minio/client";
+import { validate as uuidValidate } from "uuid";
 
 export async function editFaq(formData: FormData) {
 	let schema = z.object({
@@ -74,6 +78,11 @@ export async function deleteCandidate(userId) {
 	});
 	let parsedData: any;
 	try {
+		await deleteProfilePicture(userId);
+	} catch (e) {
+		return { ok: false, message: "An error occurred while deleting the candidate. (P2)" };
+	}
+	try {
 		parsedData = schema.parse({ id: userId });
 	} catch ({ errors }) {
 		return { ok: false, message: errors[0].message };
@@ -96,4 +105,164 @@ export async function deleteCandidate(userId) {
 		return { ok: false, message: "An error occurred while deleting the candidate" };
 	}
 	return { ok: true, message: "Candidate deleted successfully" };
+}
+
+export async function editCandidate(formData: FormData) {
+	console.log(formData);
+	let schema = z.object({
+		id: z.string().uuid(),
+		officialName: z.string({ required_error: "First name is required" }).trim().min(1).max(50, "First name can't be longer than 50 characters"),
+		officialSurname: z.string({ required_error: "Last name is required" }).trim().min(1).max(50, "Last name can't be longer than 50 characters"),
+		student_id: z
+			.string()
+			.transform((v) => `s${v}`)
+			.pipe(z.string().regex(/^s\d{6}$/, "Invalid student ID")),
+		type: z.enum(["BOY", "GIRL"]),
+		slogan: z
+			.string()
+			.max(100, "Slogan can't be longer than 100 characters")
+			.transform((v) => processSlogan(v))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		instagram: z
+			.string()
+			.max(100, "Instagram username can't be longer than 100 characters")
+			.transform((v) => processSocialMediaLink(v, "instagram.com/"))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		facebook: z
+			.string()
+			.max(100, "Facebook username can't be longer than 100 characters")
+			.transform((v) => processSocialMediaLink(v, "facebook.com/"))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		twitter: z
+			.string()
+			.max(100, "Twitter username can't be longer than 100 characters")
+			.transform((v) => processSocialMediaLink(v, "twitter.com/"))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		bereal: z
+			.string()
+			.max(100, "Bereal username can't be longer than 100 characters")
+			.transform((v) => processSocialMediaLink(v, "bere.al/"))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		snapchat: z
+			.string()
+			.max(100, "Snapchat username can't be longer than 100 characters")
+			.transform((v) => processSocialMediaLink(v, "snapchat.com/"))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		website: z
+			.string()
+			.max(100, "Website URL can't be longer than 100 characters")
+			.transform((v) => processSocialMediaLink(v, ""))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		youtube: z
+			.string()
+			.max(100, "Youtube username can't be longer than 100 characters")
+			.transform((v) => processSocialMediaLink(v, "youtube.com/"))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		video_url: z
+			.string()
+			.max(11, "Video URL can't be longer than 11 characters")
+			.transform((v) => processVideoUrl(v))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		speech_url: z
+			.string()
+			.max(11, "Speech URL can't be longer than 11 characters")
+			.transform((v) => processVideoUrl(v))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		slug: z
+			.string()
+			.max(100, "Slug can't be longer than 100 characters")
+			.transform((v) => processSlug(v))
+			.transform((v) => (v ? v : null))
+			.optional(),
+		bio: z
+			.string()
+			.max(750, "Bio can't be longer than 750 characters")
+			.transform((v) => processBio(v))
+			.transform((v) => (v ? v : null))
+			.optional(),
+	});
+
+	let parsedData: any;
+	try {
+		parsedData = schema.parse(Object.fromEntries(formData));
+	} catch ({ errors }) {
+		return { ok: false, message: errors[0].message };
+	}
+	const { id, ...data } = parsedData;
+	try {
+		await prisma.candidate.update({ where: { id }, data: data });
+	} catch (e) {
+		return { ok: false, message: "An error occurred while editing the candidate" };
+	}
+	return { ok: true, message: "Candidate edited successfully" };
+}
+
+export async function uploadProfilePicture(formData: FormData) {
+	const id = formData.get("id");
+	const photo = formData.get("photo") as File;
+	if (!uuidValidate(id)) return { ok: false, message: "Invalid candidate ID" };
+	if (!photo) return { ok: false, message: "Photo is required" };
+
+	if (photo.size > 10000000) return { ok: false, message: "The maximum file size is 10MB" };
+	if (!photo.type.includes("image")) return { ok: false, message: "File is not an image" };
+	if (photo.type !== "image/jpeg" && photo.type !== "image/png" && photo.type !== "image/gif") return { ok: false, message: "Supported image types are JPEG, PNG, and GIF" };
+
+	const data = await photo.arrayBuffer();
+	const buffer = Buffer.from(data);
+
+	const randomUUID = uuidv4();
+	const fileName = randomUUID + "." + photo.type.split("/")[1] || "";
+	const minioClient = minio();
+
+	try {
+		await prisma.$transaction(
+			async (tx) => {
+				await deleteProfilePicture(id);
+				await minioClient.putObject("eselections.org", `avatars/${fileName}`, buffer, null, {
+					"Content-Type": photo.type,
+				});
+				await tx.candidate.update({ where: { id }, data: { photo: fileName } });
+			},
+			{
+				maxWait: 5000,
+				timeout: 900000,
+			}
+		);
+	} catch (e) {
+		return { ok: false, message: "An error occurred while uploading the photo" };
+	}
+	return { ok: true, message: "Photo uploaded successfully" };
+}
+
+export async function deleteProfilePicture(candidateId) {
+	if (!uuidValidate(candidateId)) return { ok: false, message: "Invalid candidate ID" };
+	const minioClient = minio();
+	try {
+		await prisma.$transaction(
+			async (tx) => {
+				const candidateAvatar = await tx.candidate.findUnique({ where: { id: candidateId }, select: { photo: true } });
+				if (!candidateAvatar) return { ok: false, message: "Candidate not found" };
+				const avatar = candidateAvatar.photo;
+				await minioClient.removeObject("eselections.org", `avatars/${avatar}`);
+				await tx.candidate.update({ where: { id: candidateId }, data: { photo: null } });
+			},
+			{
+				maxWait: 5000,
+				timeout: 900000,
+			}
+		);
+	} catch (e) {
+		return { ok: false, message: "An error occurred while deleting the photo" };
+	}
+	return { ok: true, message: "Photo deleted successfully" };
 }

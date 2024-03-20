@@ -17,7 +17,9 @@ export const Spotlight = ({ className, fill }: SpotlightProps) => {
 	async function handlePathnameChange() {
 		setIsMounted(false);
 		await new Promise((resolve) => setTimeout(resolve, 100));
-		setIsMounted(true);
+		if (!pathname.includes("dashboard")) {
+			setIsMounted(true);
+		}
 	}
 	React.useEffect(() => {
 		handlePathnameChange();

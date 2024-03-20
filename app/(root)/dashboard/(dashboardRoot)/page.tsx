@@ -34,8 +34,8 @@ export default async function Component({ searchParams }) {
 			<AddElectionModal />
 			<ul className="w-full grid gap-4">
 				{elections.map((election) => {
-					//endDay in form March 9
-					const endDay = new Date(election.voting_end_date).toLocaleDateString("en-US", {
+					//endDay in form March 9 in format YYYY-MM-DD as string
+					const endDay = new Date(election.election_date).toLocaleDateString("en-US", {
 						month: "long",
 						day: "numeric",
 					});

@@ -57,5 +57,5 @@ export async function weducLogin(username: string, password: string) {
 	const profilePictureUrl = profilePictureMatch?.[1];
 	const studentId = username;
 	//only years 3,4,5,6,7 are allowed to vote
-	return { fullName, email, profilePictureUrl, role: "student", student: { studentId, formClass, yearGroup } };
+	return { fullName, email, profilePictureUrl, role: "student", student: { studentId, yearGroup } };
 }

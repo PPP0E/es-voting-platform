@@ -5,6 +5,7 @@ export function nameCase(name) {
 		.split(/\s|-/)
 		.map(capitalize)
 		.join(" ")
-		.replace(/-/g, " - ");
+		.replace(/-/g, " - ")
+		.replace("  ", " ");
 	return capitalized;
 }

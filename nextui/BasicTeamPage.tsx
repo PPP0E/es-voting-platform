@@ -7,31 +7,33 @@ import { Link as NextUILink } from "@nextui-org/link";
 
 import TeamMemberCard from "./team-member-card";
 import Icon from "@/components/ui/Icon";
+import Confetti from "@/components/ui/confetti";
 
 export default function Component({ election, hideDescription = false, hideButtons = false }) {
 	return (
 		<>
-			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto items-center py-24 px-4">
+			{election.publish_results && <Confetti />}
+			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto min-h-screen items-center py-24 px-4">
 				<div className="flex max-w-xl flex-col text-center">
 					{!!election.Candidate.length && (
 						<>
-							<h2 className="font-medium text-white/70">2024 Student Elections</h2>
-							{/* 							<h1 className="text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">Meet the candidates. </h1>
-							 */}{" "}
-							<h1 className="text-4xl font-medium tracking-tight">Meet the candidates.</h1>
+							<h2 className="font-medium text-white/70">{election.election_year} Student Elections</h2>
+							{/* 							<h1 className="text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">{!election.is_current ? "Meet the winners." : "Meet the candidates."}</h1>
+							 */}
+							<h1 className="text-4xl font-medium tracking-tight">{election.publish_results ? "Meet the winners." : "Meet the candidates."}</h1>
 							<Spacer y={1} />
 						</>
 					)}
-					{!hideDescription && !!election.Candidate.length && (
+					{!!election.Candidate.length && (
 						<>
-							<h2 className="text-large text-default-500">Our philosophy is to build a great team and then empower them to do great things.</h2>
+							<h2 className="text-large text-default-500">{election.publish_results ? "United in vision and poised for action, our elected leaders are ready to make an impact." : "Our philosophy is to build a great team and then empower them to do great things."}</h2>
 							<Spacer y={4} />
 						</>
 					)}
 					{!hideButtons && !!election.Candidate.length && (
 						<div className="flex w-full justify-center gap-2">
-							<Button as={Link} href={`/elections/${"2024"}`} variant="ghost">
-								2024 Elections
+							<Button as={Link} href={`/elections/${election.election_year}`} variant="ghost">
+								{election.election_year} Candidates
 							</Button>
 							<Button as={Link} href="/elections" color="secondary">
 								Past Elections
@@ -52,8 +54,13 @@ export default function Component({ election, hideDescription = false, hideButto
 						</NextUILink>
 					</div>
 				)}
+				{election.publish_results && (
+					<Button as={Link} href={`/elections/${election.election_year}/candidates`} className="bg-content1/60 w-max p-2 px-6 border rounded-full mx-auto bottom-0 mt-auto">
+						View All Candidates
+					</Button>
+				)}
 			</section>
-			{election.Candidate.length && (
+			{!!election.Candidate.length && election.is_current && (
 				<div className="mb-20 pwa:hidden flex">
 					<div className="text-tiny md:hover:bg-white md:hover:text-black duration-300 cursor-pointer bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
 						<Icon icon="material-symbols:info" width={24} />

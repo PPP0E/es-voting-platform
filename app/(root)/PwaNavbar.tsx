@@ -11,7 +11,11 @@ import { Icon } from "@iconify/react";
 
 export default function Component({ faqsCount }) {
 	const { data: session, status } = useSession();
-
+	const fullName = session?.user?.fullName;
+	const nameInitials = fullName
+		?.split(" ")
+		.map((name) => name[0])
+		.join("");
 	return (
 		<Navbar
 			classNames={{
@@ -38,14 +42,14 @@ export default function Component({ faqsCount }) {
 					<NavbarItem className="flex gap-2 align-middle justify-center">
 						<Dropdown placement="bottom-end">
 							<DropdownTrigger>
-								<Avatar isBordered as="button" className="transition-transform" showFallback size="sm" name={session.user.fullName.split(" ")[0].split("")[0] + session.user.fullName.split(" ")[1].split("")[0]} src={session.user.profilePictureUrl} />
+								<Avatar isBordered as="button" className="transition-transform" showFallback size="sm" name={nameInitials} src={session.user.profilePictureUrl} />
 							</DropdownTrigger>
 							<DropdownMenu>
 								<DropdownItem key="profile" className="gap-2 disabled:!text-white">
-									<p className="font-thin">Signed in as</p> <p className="font-semibold">{session.user.fullName}</p>
+									<p className="font-thin">Signed in as</p> <p className="font-semibold">{fullName}</p>
 									{session.user.student == "student" && (
 										<p className="font-semibold">
-											{session.user.student.studentId} • {session.user.student.formClass}
+											{session.user.student.studentId} • Year {session.user.student.yearGroup}
 										</p>
 									)}
 									{session.user.admin && (

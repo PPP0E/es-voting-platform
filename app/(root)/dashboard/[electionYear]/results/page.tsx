@@ -1,7 +1,7 @@
 import prisma from "@/prisma/client";
 import { Avatar } from "@nextui-org/avatar";
 import { Progress } from "@nextui-org/progress";
-import Revalidator from "../results/Revalidator";
+import Revalidator from "./Revalidator";
 import { Spacer } from "@nextui-org/react";
 import { Chip } from "@nextui-org/chip";
 import { isVotingRunning } from "@/lib/isVotingRunning";
@@ -68,7 +68,7 @@ export default async function Component({ params }) {
 	const usedBallotsText = usedBallots <= totalBallots ? `${usedBallots} out of ${totalBallots} Ballots` : `${usedBallots} Ballots Used`;
 	const isValid = usedBallots <= totalBallots;
 	const areResultsPublished = selectedElection.publish_results;
-	const isElectionUpcoming = (selectedElection.voting_start_date > new Date() && !isElectionRunning && selectedElection.autoEnabled) || true;
+	const isElectionUpcoming = (selectedElection.election_date > new Date() && !isElectionRunning && selectedElection.autoEnabled) || true;
 	return (
 		<div>
 			{isElectionRunning && (
@@ -129,13 +129,13 @@ export default async function Component({ params }) {
 							<div className="flex text-right ml-auto flex-col gap-1">
 								<div className="flex gap-2">
 									<p className="bg-gradient-to-br ml-auto from-foreground-800 to-foreground-500 bg-clip-text text-xl font-regular tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">
-										{new Date(selectedElection.voting_start_date).toLocaleString("en-US", {
+										{/* {new Date(selectedElection.voting_start_date).toLocaleString("en-US", {
 											month: "long",
 											day: "numeric",
 											hour: "2-digit",
 											minute: "2-digit",
 											hour12: false,
-										})}
+										})} */}
 									</p>
 								</div>
 							</div>
@@ -156,7 +156,7 @@ export default async function Component({ params }) {
 					return (
 						<li key={index} className="w-full flex-col gap-2 bg-content1/60 p-4 flex md:flex-col rounded-xl border">
 							<div className="flex">
-								<Avatar isBordered className="my-auto mr-4 ml-1" src="" />
+								<Avatar isBordered className="my-auto mr-4 ml-1" src={`/api/users/${candidate.id}/avatar`} />
 								<div className="flex flex-col gap-1">
 									<div className="flex gap-2">
 										<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{fullName}</p>
@@ -192,7 +192,7 @@ export default async function Component({ params }) {
 					return (
 						<li key={index} className="w-full flex-col gap-2 bg-content1/60 p-4 flex md:flex-col rounded-xl border">
 							<div className="flex">
-								<Avatar isBordered className="my-auto mr-4 ml-1" src="" />
+								<Avatar isBordered showFallback className="my-auto mr-4 ml-1" src={`/api/users/${candidate.id}/avatar`} />
 								<div className="flex flex-col gap-1">
 									<div className="flex gap-2">
 										<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{fullName}</p>

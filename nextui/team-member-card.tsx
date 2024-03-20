@@ -29,7 +29,7 @@ export type TeamMemberCardProps = React.HTMLAttributes<HTMLDivElement> & TeamMem
 
 const TeamMemberCard = React.forwardRef<HTMLDivElement, TeamMemberCardProps>(({ electionYear, id, slug, avatar, officialName, officialSurname, type, slogan, instagram, facebook, twitter, bereal, snapchat, youtube, website, className, ...props }, ref) => (
 	<div ref={ref} className={cn(`flex flex-col items-center hover:shadow-gray-900 hover:shadow-md duration-300 rounded-large bg-content1/60 px-4 py-4 text-center shadow-small`, className)} {...props}>
-		<Avatar showFallback className="h-20 w-20" src={avatar} />
+		<Avatar showFallback className="h-20 w-20" src={`/api/users/${id}/avatar`} />
 		<h3 className="mt-2 font-medium">{officialName + " " + officialSurname || children}</h3>
 		<span className="text-small text-default-500 ">{type == "GIRL" ? "Head Girl Candidate" : "Head Boy Candidate"}</span>
 		<p className="mb-4 mt-2 text-default-600">{slogan}</p>

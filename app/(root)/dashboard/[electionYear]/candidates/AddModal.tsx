@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { flushSync } from "react-dom";
 import { nameCase } from "@/lib/nameCase";
 
-export default function Component({ selectedElectionYear }) {
+export default function Component({ selectedElectionYear, isBlocked }) {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function Component({ selectedElectionYear }) {
 	}, [searchParams.has("add")]);
 
 	return (
-		<Modal isOpen={searchParams.has("add")} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
+		<Modal isOpen={searchParams.has("add") && !isBlocked} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">Add Candidate</ModalHeader>
 				<ModalBody id="main" as="form" action={addcandidateHandler}>

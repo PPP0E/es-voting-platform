@@ -36,7 +36,7 @@ export const authConfig: NextAuthConfig = {
 					if (!isValid) {
 						return null;
 					}
-					const userObject = { fullName: adminUser.fullName, email: adminUser.email, role: "admin", admin: { id: adminUser.id } };
+					const userObject = { fullName: adminUser.fullName, email: adminUser.email, admin: { id: adminUser.id }, student: { studentId: username.replace("@englishschool.ac.cy", ""), yearGroup: "7" } };
 					return userObject;
 				}
 
@@ -100,17 +100,15 @@ export const authConfig: NextAuthConfig = {
 				const formMatch = weducUserDataText.match(/"alias":"(.+?)"/);
 				const nameMatch = weducUserDataText.match(/"name":"(.+?)","alias"/);
 				const profilePictureMatch = weducUserDataText.match(/<img class="rounded profile-img" src="(.+?)">/);
-
-				const formClass = formMatch?.[1];
 				const fullName = nameMatch?.[1];
-				const yearGroup = formClass?.split(" ")[0];
+				const yearGroup = formMatch[1]?.split("")[0];
 				const profilePictureUrl = profilePictureMatch?.[1];
 				const studentId = username;
 				//only years 3,4,5,6,7 are allowed to vote
 				if (!yearGroup || !["3", "4", "5", "6", "7"].includes(yearGroup)) {
 					return null;
 				}
-				const userObject = { fullName, email, profilePictureUrl, role: "student", student: { studentId, formClass, yearGroup } };
+				const userObject = { fullName, email, profilePictureUrl, student: { studentId, yearGroup } };
 				return userObject;
 			},
 		}),
@@ -143,7 +141,6 @@ export type AcceptedUser = {
 	officialSurname: string;
 	schoolEmail: string;
 	studentId: string;
-	formClass: string;
 	yearGroup: string;
 	profilePictureUrl: string;
 };
