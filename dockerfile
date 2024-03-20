@@ -1,5 +1,8 @@
 FROM node:20.11.1 as builder
 
+ARG DATABASE_URL
+ENV DATABASE_URL $DATABASE_URL
+
 # COPY --from=builder /app/next.config.js ./
 COPY package.json /tmp/package.json
 RUN cd /tmp && npm install --ignore-engines
