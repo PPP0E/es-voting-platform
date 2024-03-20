@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import VoteSelector from "./VoteSelector";
 
+export const dynamic = "force-dynamic";
+
 export default async function Component({ params }) {
 	const session = await auth();
 	const currentElection = await prisma.election.findFirst({
@@ -15,7 +17,8 @@ export default async function Component({ params }) {
 			Candidate: true,
 		},
 	});
-	if (!session) redirect("/");
+	if (!currentElection || !session) redirect("/");
+
 	const votes = await prisma.vote.findMany({
 		where: {
 			student_id: session.user.student.studentId,

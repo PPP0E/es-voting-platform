@@ -1,5 +1,6 @@
 FROM node:20.11.1 as builder
 
+# COPY --from=builder /app/next.config.js ./
 COPY package.json /tmp/package.json
 RUN cd /tmp && npm install --ignore-engines
 RUN mkdir -p /usr/src/app && cp -a /tmp/node_modules /usr/src/app/

@@ -65,12 +65,12 @@ export default function Component({ faqsCount, currentElection }) {
 				<NavbarItem as={Link} href="/elections" className="hidden md:flex" isActive={pathname == "/elections"}>
 					Elections
 				</NavbarItem>
-				{status == "authenticated" && session.user.admin && (
+				{status == "authenticated" && session.user?.admin && (
 					<NavbarItem as={Link} href="/dashboard" className="hidden md:flex" isActive={pathname == "/dashboard"}>
 						Dashboard
 					</NavbarItem>
 				)}
-				{status == "authenticated" && session.user.student && isElectionRunning && (
+				{status == "authenticated" && session.user?.student && isElectionRunning && (
 					<NavbarItem as={Link} href="/vote" className="hidden md:flex animate-pulse text-red-500" isActive={pathname == "/vote"}>
 						Vote
 					</NavbarItem>

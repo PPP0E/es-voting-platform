@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 export async function TopFlower() {
 	const session = await auth();
 	if (!session) return null;
-	if (!session.user.student) return null;
+	if (!session.user?.student) return null;
 	const studentId = session.user.student.studentId;
 	if (!studentId) return null;
 	const onlyStudentId = ["s181143"];

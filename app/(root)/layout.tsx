@@ -12,11 +12,13 @@ import prisma from "@/prisma/client";
 import { redirect } from "next/navigation";
 import PwaDetector from "./PwaDetector";
 import PwaNavbar from "./PwaNavbar";
-import { BottomFlower, TopFlower } from "./flowers";
+import { TopFlower } from "./flowers";
 
 export const metadata = {
 	title: "The English School Student Elections",
 };
+
+export const runtime = "nodejs";
 
 const montserrat = Montserrat({
 	subsets: ["latin"],
