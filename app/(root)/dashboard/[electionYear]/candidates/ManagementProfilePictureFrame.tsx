@@ -10,7 +10,6 @@ import Image from "next/image";
 import { removeSearchParams } from "@/lib/searchParams";
 
 export default function ManagementProfilePictureFrame({ candidate }) {
-	console.log("candidate", candidate);
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [url, setUrl] = useState(`/api/users/${candidate.id}/avatar`);

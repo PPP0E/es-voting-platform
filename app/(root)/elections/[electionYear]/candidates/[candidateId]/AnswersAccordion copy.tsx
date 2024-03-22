@@ -10,7 +10,6 @@ import Image from "next/image";
 export function ProfileTabs({ candidate }) {
 	const [selectedTab, setSelectedTab] = useState("about");
 	const displaySocials = !!(candidate.instagram || candidate.facebook || candidate.twitter || candidate.snapchat || candidate.youtube || candidate.bereal || candidate.website);
-	console.log(displaySocials);
 	return (
 		<div className="flex flex-col overflow-hidden justify-start">
 			<ScrollShadow hideScrollBar className="flex max-w-full overflow-x-scroll flex-col justify-between gap-8" orientation="horizontal">

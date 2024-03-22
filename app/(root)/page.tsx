@@ -11,6 +11,7 @@ export default async function Home() {
 		},
 		select: {
 			id: true,
+			is_current: true,
 			Candidate: {
 				orderBy: {
 					officialName: "asc",

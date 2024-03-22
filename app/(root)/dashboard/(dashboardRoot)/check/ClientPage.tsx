@@ -59,7 +59,7 @@ export default function ClientComponent({ votes = [] }) {
 						setShowCandidate(false);
 						updateSearchParams({ votes: text.split("#").join("+") }, router);
 					}}
-					onError={(error) => console.log(error?.message)}
+					onError={() => {}}
 				/>
 			</div>
 			<Button className="bg-content1/60 border" color="danger" isDisabled={!votes.length} onPress={handleReset}>

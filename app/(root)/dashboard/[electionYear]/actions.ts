@@ -6,6 +6,9 @@ import { isVotingRunning } from "@/lib/isVotingRunning";
 import prisma from "@/prisma/client";
 
 export async function currentChange(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	await prisma.$transaction([
 		prisma.election.updateMany({
 			where: {
@@ -28,6 +31,9 @@ export async function currentChange(electionId: string, e: any) {
 }
 
 export async function automaticChange(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	await prisma.election.update({
 		where: {
 			id: electionId,
@@ -39,13 +45,15 @@ export async function automaticChange(electionId: string, e: any) {
 }
 
 export async function forceChange(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	const selectedElection = await prisma.election.findFirst({
 		where: {
 			id: electionId,
 		},
 	});
 	if (!selectedElection.is_current && e == true) {
-		console.log("forceChange", selectedElection.is_current, e);
 		return { message: "You cannot enable voting for a non-current election" };
 	}
 
@@ -60,6 +68,9 @@ export async function forceChange(electionId: string, e: any) {
 }
 
 export async function visibility(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	const selectedElection = await prisma.election.findFirst({
 		where: {
 			id: electionId,
@@ -79,6 +90,9 @@ export async function visibility(electionId: string, e: any) {
 }
 
 export async function updateElectionDate(electionId: string, date: string) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	await prisma.election.update({
 		where: {
 			id: electionId,
@@ -91,6 +105,9 @@ export async function updateElectionDate(electionId: string, date: string) {
 }
 
 export async function updateStartTime(electionId: string, time: string) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	await prisma.election.update({
 		where: {
 			id: electionId,
@@ -103,12 +120,12 @@ export async function updateStartTime(electionId: string, time: string) {
 }
 
 export async function deleteAllVotes(electionId: string, password: string) {
-	if (!password || password.length < 8) {
-		return { ok: false, message: "Invalid password" };
-	}
 	const session = await auth();
 	if (!session) return { ok: false, message: "Unauthorized" };
 	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	if (!password || password.length < 8) {
+		return { ok: false, message: "Invalid password" };
+	}
 	const selectedUser = await prisma.admin.findFirst({
 		where: {
 			id: session.user.admin.id,
@@ -149,6 +166,9 @@ export async function deleteAllVotes(electionId: string, password: string) {
 }
 
 export async function updateEndTime(electionId: string, time: string) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	await prisma.election.update({
 		where: {
 			id: electionId,
@@ -158,4 +178,45 @@ export async function updateEndTime(electionId: string, time: string) {
 		},
 	});
 	return { ok: true };
+}
+
+export async function deleteElection(electionId: string, password: string) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	if (!password || password.length < 8) {
+		return { ok: false, message: "Invalid password" };
+	}
+	const selectedUser = await prisma.admin.findFirst({
+		where: {
+			id: session.user.admin.id,
+		},
+	});
+	if (!selectedUser) return { ok: false, message: "Unauthorized" };
+	const validatePassword = await verifyPassword(password, selectedUser.password);
+	if (!validatePassword) return { ok: false, message: "Invalid password" };
+	const selectedElection = await prisma.election.findFirst({
+		where: {
+			id: electionId,
+		},
+	});
+	const isElectionRunning = isVotingRunning(selectedElection);
+	if (isElectionRunning) {
+		return { ok: false, message: "You can't delete an election which is currently running." };
+	}
+	//check if all the candidates are deleted if not dont allow to delete election
+	const candidates = await prisma.candidate.findMany({
+		where: {
+			election_id: electionId,
+		},
+	});
+	if (candidates.length > 0) {
+		return { ok: false, message: "You can't delete an election which has candidates." };
+	}
+	await prisma.election.delete({
+		where: {
+			id: electionId,
+		},
+	});
+	return { ok: true, message: "Election deleted" };
 }

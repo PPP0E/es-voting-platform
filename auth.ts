@@ -116,8 +116,8 @@ export const authConfig: NextAuthConfig = {
 	trustHost: true,
 	logger: {
 		error: process.env.NODE_ENV === "production" ? () => {} : () => {},
-		warn: console.warn,
-		debug: console.log,
+		warn: () => {},
+		debug: () => {},
 	},
 	callbacks: {
 		async jwt({ token, user, trigger }) {

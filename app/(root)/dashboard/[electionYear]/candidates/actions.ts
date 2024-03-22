@@ -8,8 +8,12 @@ import { v4 as uuidv4 } from "uuid";
 import { processSlogan, processBio, processSocialMediaLink, processVideoUrl, processSlug } from "@/lib/textOperations";
 import { minio } from "@/minio/client";
 import { validate as uuidValidate } from "uuid";
+import { auth } from "@/auth";
 
 export async function editFaq(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		id: z.string().uuid(),
 		title: z.string({ required_error: "Title is required" }).min(1).max(100, "Title can't be longer than 100 characters").trim(),
@@ -27,6 +31,9 @@ export async function editFaq(formData: FormData) {
 }
 
 export async function addCandidate(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		officialName: z.string({ required_error: "First name is required" }).trim().min(1).max(50, "First name can't be longer than 50 characters"),
 		officialSurname: z.string({ required_error: "Last name is required" }).trim().min(1).max(50, "Last name can't be longer than 50 characters"),
@@ -73,6 +80,9 @@ export async function addCandidate(formData: FormData) {
 }
 
 export async function deleteCandidate(userId) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		id: z.string().uuid(),
 	});
@@ -108,7 +118,9 @@ export async function deleteCandidate(userId) {
 }
 
 export async function editCandidate(formData: FormData) {
-	console.log(formData);
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		id: z.string().uuid(),
 		officialName: z.string({ required_error: "First name is required" }).trim().min(1).max(50, "First name can't be longer than 50 characters"),
@@ -208,6 +220,9 @@ export async function editCandidate(formData: FormData) {
 }
 
 export async function uploadProfilePicture(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	const id = formData.get("id");
 	const photo = formData.get("photo") as File;
 	if (!uuidValidate(id)) return { ok: false, message: "Invalid candidate ID" };
@@ -245,6 +260,9 @@ export async function uploadProfilePicture(formData: FormData) {
 }
 
 export async function deleteProfilePicture(candidateId) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	if (!uuidValidate(candidateId)) return { ok: false, message: "Invalid candidate ID" };
 	const minioClient = minio();
 	try {

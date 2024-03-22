@@ -1,9 +1,13 @@
 "use server";
 
+import { auth } from "@/auth";
 import prisma from "@/prisma/client";
 import { z } from "zod";
 
 export async function moveUp(id: string, electionYear: string) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	if (!id) {
 		return { ok: false, message: "Question not found" };
 	}
@@ -25,6 +29,9 @@ export async function moveUp(id: string, electionYear: string) {
 }
 
 export async function moveDown(id: string, electionYear: string) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	if (!id) {
 		return { ok: false, message: "Question not found" };
 	}
@@ -49,6 +56,9 @@ export async function moveDown(id: string, electionYear: string) {
 }
 
 export async function deleteQuestion(id: string, electionYear: string) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let currentQuestions;
 	try {
 		currentQuestions = await prisma.question.findMany({ where: { election: { election_year: electionYear } }, orderBy: { index: "asc" } });
@@ -71,6 +81,9 @@ export async function deleteQuestion(id: string, electionYear: string) {
 }
 
 export async function editQuestion(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		id: z.string().uuid(),
 		title: z.string({ required_error: "Title is required" }).min(1).max(100, "Title can't be longer than 100 characters").trim(),
@@ -95,6 +108,9 @@ export async function editQuestion(formData: FormData) {
 }
 
 export async function addQuestion(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		title: z.string({ required_error: "Title is required" }).min(1).max(100, "Title can't be longer than 100 characters").trim(),
 		content: z

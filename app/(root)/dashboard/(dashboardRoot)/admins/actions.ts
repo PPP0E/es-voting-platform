@@ -6,8 +6,10 @@ import prisma from "@/prisma/client";
 import { z } from "zod";
 
 export async function deleteAdmin(id: string) {
-	let adminCount;
 	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	let adminCount;
 	const sessionId = session.user.admin.id;
 	if (sessionId === id) {
 		return { ok: false, message: "You can't delete yourself" };
@@ -29,6 +31,9 @@ export async function deleteAdmin(id: string) {
 }
 
 export async function editAdmin(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		id: z.string().uuid(),
 		fullName: z.string({ required_error: "Full Name is required" }).trim().max(50, "Title name be longer than 50 characters"),
@@ -46,6 +51,9 @@ export async function editAdmin(formData: FormData) {
 }
 
 export async function editPassword(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		id: z.string().uuid(),
 		password: z.string({ required_error: "Password is required" }).trim().min(8, "Password can't be shorter than 8 characters").max(50, "Password can't be longer than 50 characters"),
@@ -62,6 +70,9 @@ export async function editPassword(formData: FormData) {
 }
 
 export async function addAdmin(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		fullName: z.string({ required_error: "Full name is required" }).trim().max(50, "Name can't be longer than 50 characters"),
 		email: z.string({ required_error: "Email is required" }).trim().min(1).max(50, "Email can't be longer than 50 characters").toLowerCase(),

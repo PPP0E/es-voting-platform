@@ -25,7 +25,6 @@ export async function GET(request, { params }) {
 	try {
 		url = await minioClient.presignedGetObject("eselections.org", "avatars/" + userExists.photo, 30 * 60);
 	} catch (e) {
-		console.log(e);
 		notFound();
 	}
 	return NextResponse.redirect(url);

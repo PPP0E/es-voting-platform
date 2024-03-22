@@ -4,7 +4,7 @@ import SwitchCell from "@/nextui/switch-cell";
 import type { CardProps } from "@nextui-org/react";
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spacer } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { automaticChange, currentChange, deleteAllVotes, forceChange, updateElectionDate, updateEndTime, updateStartTime, visibility } from "./actions";
+import { automaticChange, currentChange, deleteAllVotes, deleteElection, forceChange, updateElectionDate, updateEndTime, updateStartTime, visibility } from "./actions";
 import { useRouter } from "next/navigation";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
 import { Select, SelectSection, SelectItem } from "@nextui-org/select";
@@ -17,6 +17,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	const [isLoading, setIsLoading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [isDeleteElectionModalOpen, setIsDeleteElectionModalOpen] = useState(false);
 	const [electionDate, setElectionDate] = useState(selectedElection.election_date || "");
 	const [debouncedElectionDate] = useDebouncedValue(electionDate, 1000);
 	const [electionStartTime, setElectionStartTime] = useState(selectedElection.voting_start_time || "");
@@ -87,7 +88,6 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	async function setElectionDateHandler() {
 		setIsLoading(true);
 		const res = await updateElectionDate(selectedElection.id, debouncedElectionDate);
-		console.log(res);
 		if (res.ok) {
 			toast.success("Election date updated");
 		} else {
@@ -177,6 +177,20 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 		setPassword("");
 	}
 
+	async function deleteElectionHandler() {
+		setIsLoading(true);
+		const res = await deleteElection(selectedElection.id, password);
+		if (res.ok) {
+			toast.success("Election deleted");
+			setIsDeleteElectionModalOpen(false);
+		} else {
+			toast.error(res.message || "An error occurred while deleting election.");
+		}
+		router.refresh();
+		setIsLoading(false);
+		setPassword("");
+	}
+
 	useEffect(() => {
 		if (debouncedElectionDate !== selectedElection.election_date) {
 			setElectionDateHandler();
@@ -226,7 +240,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 				isOpen={isDeleteModalOpen}>
 				<ModalContent>
 					<ModalHeader className="flex flex-col gap-1">Delete All Votes</ModalHeader>
-					<ModalBody id="delete" as="form" action={deleteAllVotesHandler}>
+					<ModalBody id="deleteVotes" as="form" action={deleteAllVotesHandler}>
 						<p>Are you sure you want to delete all the votes of the {selectedElection.election_year} elections?</p>
 						<Input value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
 					</ModalBody>
@@ -240,7 +254,35 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 							variant="light">
 							Close
 						</Button>
-						<Button isDisabled={isElectionRunning || !password || password.length < 8} isLoading={isLoading} onPress={deleteAllVotesHandler} color="primary">
+						<Button isDisabled={isElectionRunning || !password || password.length < 8} type="submit" isLoading={isLoading} form="deleteVotes" color="primary">
+							Confirm
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			<Modal
+				onClose={() => {
+					setIsDeleteModalOpen(false);
+					setPassword("");
+				}}
+				isOpen={isDeleteModalOpen}>
+				<ModalContent>
+					<ModalHeader className="flex flex-col gap-1">Delete the Election</ModalHeader>
+					<ModalBody as="form" id="deleteElection" action={deleteAllVotesHandler}>
+						<p>Are you sure you want to delete the {selectedElection.election_year} election?</p>
+						<Input value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
+					</ModalBody>
+					<ModalFooter>
+						<Button
+							onPress={() => {
+								setIsDeleteModalOpen(false);
+								setPassword("");
+							}}
+							color="danger"
+							variant="light">
+							Close
+						</Button>
+						<Button isDisabled={isElectionRunning || !password || password.length < 8} type="submit" isLoading={isLoading} form="deleteElection" color="primary">
 							Confirm
 						</Button>
 					</ModalFooter>
@@ -353,8 +395,8 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 							<p className="text-medium">Delete Election</p>
 							<p className="text-small text-default-500">Deletes the whole election, requires all candidates to be deleted.</p>
 						</div>
-						<Button color="primary" isDisabled={isElectionRunning || !!numberOfCandidates} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto">
-							{isElectionRunning || !!numberOfCandidates ? "Election Currently Can't Be Deleted" : "Delete"}
+						<Button color="primary" isDisabled={isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto">
+							{isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled ? "Election Currently Can't Be Deleted" : "Delete"}
 						</Button>
 					</div>
 				</form>

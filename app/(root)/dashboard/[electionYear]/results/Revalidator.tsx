@@ -13,7 +13,6 @@ export function Revalidator({ revalidate = 10000 }) {
 		const interval = setInterval(() => {
 			if (!isProgressive) return;
 			router.refresh();
-			console.log("refreshed");
 		}, revalidate);
 		return () => clearInterval(interval);
 	});

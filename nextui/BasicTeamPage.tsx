@@ -68,7 +68,15 @@ export default function Component({ election, hideDescription = false, hideButto
 				<div className="mb-20 pwa:hidden flex">
 					<div className="text-tiny md:hover:bg-white md:hover:text-black duration-300 cursor-pointer bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
 						<Icon icon="material-symbols:info" width={24} />
-						<p className="my-auto ml-2">Candidates are randomly shuffled every time</p>
+						<p className="my-auto ml-2">Candidates are shuffled every minute</p>
+					</div>
+				</div>
+			)}
+			{!!election.Candidate.length && !election.is_current && (
+				<div className="mb-20 pwa:hidden flex">
+					<div className="text-tiny md:hover:bg-white md:hover:text-black duration-300 cursor-pointer bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
+						<Icon icon="material-symbols:info" width={24} />
+						<p className="my-auto ml-2">Candidates are in alphabetical order</p>
 					</div>
 				</div>
 			)}

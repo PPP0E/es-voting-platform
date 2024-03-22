@@ -17,7 +17,7 @@ export default async function Component({ params }) {
 			Candidate: true,
 		},
 	});
-	if (!currentElection || !session) redirect("/");
+	if (!currentElection || !session || !session?.student) redirect("/");
 
 	const votes = await prisma.vote.findMany({
 		where: {

@@ -6,13 +6,16 @@ import { Link } from "@nextui-org/link";
 import { Icon } from "@iconify/react/dist/offline";
 import groupIcon from "@iconify/icons-solar/users-group-two-rounded-linear";
 
-export const revalidate = 60 * 5; // 5 minutes
+export const revalidate = 60; // 1 minute
 
 function formatDate(dateString) {
 	const date = new Date(dateString);
-	const formatted = date.toLocaleDateString();
-	if (formatted == "Invalid Date") return "01/01/1970";
-	if (formatted == "1/1/1970") return "01/01/1970";
+	//day first
+	const formatted = date.toLocaleDateString("en-US", {
+		month: "long",
+		day: "numeric",
+	});
+
 	return formatted;
 }
 
@@ -36,9 +39,7 @@ export default async function Component({ params }) {
 			<ul className="mt-12 grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 				{elections.map((election) => {
 					const date = formatDate(election.election_date);
-					const printDate = date != "01/01/1970" ? ` • ${date}` : "";
-					const candidateS = election.Candidate.length > 1 || !election.Candidate.length ? "s" : "";
-					const candidateCount = election.Candidate.length;
+					const printDate = date != "01/01/1970" ? date : "";
 					return (
 						<li key={election.id} className="bg-content1/60 p-4 rounded-large flex flex-col gap-4">
 							{/* 						<h2 className="text-large text-default-600 my-auto text-center md:text-left">{election.election_year} Student Elections</h2>
@@ -48,10 +49,7 @@ export default async function Component({ params }) {
 								<br />
 								Elections
 							</h2>
-							<h2 className="text-large text-default-500">
-								{candidateCount} Candidate{candidateS}
-								{printDate}
-							</h2>
+							<h2 className="text-large text-default-500">{printDate}</h2>
 							<Button as={Link} href={`/elections/${election.election_year || election.id}`} fullWidth className="border-small ml-auto border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-full">
 								View Details
 							</Button>

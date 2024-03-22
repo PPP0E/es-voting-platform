@@ -1,9 +1,12 @@
 "use server";
+import { auth } from "@/auth";
 import prisma from "@/prisma/client";
 import { z } from "zod";
 
 export async function addElection(formData: FormData) {
-	console.log("formData", formData);
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	const schema = z.object({
 		election_year: z
 			.string()

@@ -27,8 +27,8 @@ const { auth } = NextAuth({
 	providers: [],
 	logger: {
 		error: () => {},
-		warn: console.warn,
-		debug: console.log,
+		warn: () => {},
+		debug: () => {},
 	},
 });
 

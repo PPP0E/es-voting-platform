@@ -7,8 +7,13 @@ import { Chip } from "@nextui-org/chip";
 import { isVotingRunning } from "@/lib/isVotingRunning";
 import { Button } from "@nextui-org/button";
 import Icon from "@/components/ui/Icon";
+import { auth } from "@/auth";
+import { notFound } from "next/navigation";
 
 export default async function Component({ params }) {
+	const session = await auth();
+	if (!session) notFound();
+	if (!session.user.admin) notFound();
 	const selectedYear = params.electionYear;
 	if (!selectedYear) return null;
 	const selectedElection = await prisma.election.findFirst({
