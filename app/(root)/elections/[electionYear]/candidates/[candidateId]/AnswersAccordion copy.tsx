@@ -27,7 +27,7 @@ export function ProfileTabs({ candidate }) {
 					<Tab key="about" title="About Me"></Tab>
 					{candidate.video_url && <Tab key="video" title="Video" />}
 					{candidate.speech_url && <Tab key="speech" title="Speech" />}
-					<Tab key="questions" title="Questions" />
+					{!!candidate.Answer.length && <Tab key="questions" title="Questions" />}
 					{displaySocials && <Tab key="social" title="Social Media" />}
 				</Tabs>
 			</ScrollShadow>
@@ -44,6 +44,16 @@ export function ProfileTabs({ candidate }) {
 				variant="light">
 				<Tab key="about" title="About Me">
 					<h2 className="text-large text-default-500 max-w-[600px] mx-auto text-center">{candidate.bio}</h2>
+				</Tab>
+				<Tab key="questions" title="About Me">
+					<div className="mx-auto max-w-[500px] flex flex-col gap-4">
+						{candidate.Answer.map((answer, index) => (
+							<div key={index} className="bg-content1/60 border rounded-xl p-4 gap-4 flex flex-col">
+								<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-md font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{answer.question.title}</p>
+								<p className="text-default-600 mt-1 text-xs">{answer.content}</p>
+							</div>
+						))}
+					</div>
 				</Tab>
 				<Tab key="speech" title="Speech">
 					<div className="mx-auto max-w-[500px]">

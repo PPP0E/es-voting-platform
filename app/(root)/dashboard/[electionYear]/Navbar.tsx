@@ -10,10 +10,11 @@ export default function Component({ electionYear }) {
 	const pathname = usePathname();
 	const basePath = `/dashboard/${electionYear}`;
 	const items = [
-		{ title: "General Settings", href: basePath },
-		{ title: "Voting Results", href: `${basePath}/results` },
+		{ title: "Settings", href: basePath },
+		{ title: "Results", href: `${basePath}/results` },
 		{ title: "Candidates", href: `${basePath}/candidates` },
 		{ title: "Application Questions", href: `${basePath}/questions` },
+		{ title: "Candidate Stats", href: `${basePath}/stats` },
 
 		/* 		{ title: "User Exceptions", href: `${basePath}/users` },
 		 */

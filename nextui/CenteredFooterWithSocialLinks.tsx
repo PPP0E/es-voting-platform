@@ -29,10 +29,6 @@ const navLinks = [
 		href: "https://www.englishschool.ac.cy/contact",
 	},
 	{
-		name: "Careers",
-		href: "https://www.englishschool.ac.cy/vacancies",
-	},
-	{
 		name: "MEDIMUN",
 		href: "https://www.medimun.org/home",
 	},

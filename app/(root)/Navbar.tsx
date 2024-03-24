@@ -71,8 +71,10 @@ export default function Component({ faqsCount, currentElection }) {
 					</NavbarItem>
 				)}
 				{status == "authenticated" && session.user?.student && isElectionRunning && (
-					<NavbarItem as={Link} href="/vote" className="hidden md:flex animate-pulse text-red-500" isActive={pathname == "/vote"}>
-						Vote
+					<NavbarItem as={Link} href="/vote" className="hidden md:flex" isActive={pathname == "/vote"}>
+						<Button className="rounded-full text-md" size="sm" color="danger">
+							<span className="animate-pulse px-2">Vote</span>
+						</Button>
 					</NavbarItem>
 				)}
 				{status !== "authenticated" && status !== "loading" && (

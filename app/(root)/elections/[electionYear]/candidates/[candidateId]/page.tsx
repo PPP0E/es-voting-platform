@@ -34,6 +34,11 @@ export default async function Component({ params }) {
 		},
 		include: {
 			election: true,
+			Answer: {
+				include: {
+					question: true,
+				},
+			},
 		},
 	});
 	if (candidate && candidate.slug && candidate.slug !== params.candidateId) {

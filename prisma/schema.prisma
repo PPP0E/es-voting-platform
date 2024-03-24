@@ -44,7 +44,6 @@ model Election {
 model Question {
    id          String   @id @unique @default(uuid())
    title       String
-   content     String
    election    Election @relation(fields: [election_id], references: [id])
    election_id String
    index       Int?
@@ -54,9 +53,9 @@ model Question {
 model Answer {
    id          String    @id @unique @default(uuid())
    content     String
-   question    Question  @relation(fields: [questionId], references: [id])
+   question    Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
    questionId  String
-   candidate   Candidate @relation(fields: [candidateId], references: [id])
+   candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
    candidateId String
 }
 

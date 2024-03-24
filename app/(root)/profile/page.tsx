@@ -4,12 +4,13 @@ import { redirect } from "next/navigation";
 
 export default async function Page() {
 	const session = await auth();
-	if (!session || !session.candidate) redirect("/login");
+	if (!session || !session.user.candidate) redirect("/login");
 
 	return (
 		<div>
 			<p>ADMIN {JSON.stringify(session.user.admin, null, 2)}</p>
 			<p>STUDENT {JSON.stringify(session.user.student, null, 2)}</p>
+			<p>CANDIDATE {JSON.stringify(session.user.candidate, null, 2)}</p>
 		</div>
 	);
 }

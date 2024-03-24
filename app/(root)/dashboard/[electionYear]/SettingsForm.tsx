@@ -1,10 +1,10 @@
 "use client";
 
-import SwitchCell from "@/nextui/switch-cell";
+import SwitchCell, { SwitchCellBottom, SwitchCellMiddle, SwitchCellTop } from "@/nextui/switch-cell";
 import type { CardProps } from "@nextui-org/react";
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spacer } from "@nextui-org/react";
+import { Button, Card, CardBody, CardHeader, Chip, Input, Link, Spacer } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { automaticChange, currentChange, deleteAllVotes, deleteElection, forceChange, updateElectionDate, updateEndTime, updateStartTime, visibility } from "./actions";
+import { allowEditBio, allowEditPhoto, allowEditQuestions, allowEditSlogan, allowEditSocials, automaticChange, currentChange, deleteAllVotes, deleteElection, forceChange, updateElectionDate, updateEndTime, updateStartTime, visibility } from "./actions";
 import { useRouter } from "next/navigation";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
 import { Select, SelectSection, SelectItem } from "@nextui-org/select";
@@ -12,12 +12,30 @@ import { isVotingRunning } from "@/lib/isVotingRunning";
 import { useDebouncedValue } from "@mantine/hooks";
 import { toast } from "sonner";
 import type { Election } from "@prisma/client";
+import { cn } from "@/lib/cn";
+import Icon from "@/components/ui/Icon";
+
+let months = [
+	{ name: "January", days: 31 },
+	{ name: "February", days: 28 },
+	{ name: "March", days: 31 },
+	{ name: "April", days: 30 },
+	{ name: "May", days: 31 },
+	{ name: "June", days: 30 },
+	{ name: "July", days: 31 },
+	{ name: "August", days: 31 },
+	{ name: "September", days: 30 },
+	{ name: "October", days: 31 },
+	{ name: "November", days: 30 },
+	{ name: "December", days: 31 },
+];
 
 export default function Component({ selectedElection }: { selectedElection: Election }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [isDeleteElectionModalOpen, setIsDeleteElectionModalOpen] = useState(false);
+	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 	const [electionDate, setElectionDate] = useState(selectedElection.election_date || "");
 	const [debouncedElectionDate] = useDebouncedValue(electionDate, 1000);
 	const [electionStartTime, setElectionStartTime] = useState(selectedElection.voting_start_time || "");
@@ -27,6 +45,84 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	const [password, setPassword] = useState("");
 
 	const router = useRouter();
+
+	const numberOfCandidates = selectedElection._count.Candidate;
+	const isElectionRunning = isVotingRunning(selectedElection);
+
+	const isLeapYear = (year: number) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+	if (isLeapYear(Number(selectedElection.election_year))) months[1].days = 29;
+
+	let startHours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
+	let startMinutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
+
+	let endHours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"));
+	let endMinutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
+
+	endHours = endHours.filter((hour) => parseInt(hour) >= parseInt(electionStartTime.split(":")[0]));
+
+	if (parseInt(electionEndTime.split(":")[0]) === parseInt(electionStartTime.split(":")[0])) {
+		endMinutes = endMinutes.filter((minute) => parseInt(minute) > parseInt(electionStartTime.split(":")[1]));
+	}
+
+	async function handleAllowBioChange(e: Boolean) {
+		setIsLoading(true);
+		const res = await allowEditBio(selectedElection.id, e);
+		router.refresh();
+		setIsLoading(false);
+		if (res?.ok) {
+			toast.success(res?.message);
+		} else {
+			toast.error(res?.message);
+		}
+	}
+
+	async function handleAllowEditSloganChange(e: Boolean) {
+		setIsLoading(true);
+		const res = await allowEditSlogan(selectedElection.id, e);
+		router.refresh();
+		setIsLoading(false);
+		if (res?.ok) {
+			toast.success(res?.message);
+		} else {
+			toast.error(res?.message);
+		}
+	}
+
+	async function handleAllowEditSocialsChange(e: Boolean) {
+		setIsLoading(true);
+		const res = await allowEditSocials(selectedElection.id, e);
+		router.refresh();
+		setIsLoading(false);
+		if (res?.ok) {
+			toast.success(res?.message);
+		} else {
+			toast.error(res?.message);
+		}
+	}
+
+	async function handleAllowEditPhotoChange(e: Boolean) {
+		setIsLoading(true);
+		const res = await allowEditPhoto(selectedElection.id, e);
+		router.refresh();
+		setIsLoading(false);
+		if (res?.ok) {
+			toast.success(res?.message);
+		} else {
+			toast.error(res?.message);
+		}
+	}
+
+	async function handleAllowEditQuestionsChange(e: Boolean) {
+		setIsLoading(true);
+		const res = await allowEditQuestions(selectedElection.id, e);
+		router.refresh();
+		setIsLoading(false);
+		if (res?.ok) {
+			toast.success(res?.message);
+		} else {
+			toast.error(res?.message);
+		}
+	}
 
 	async function handleCurrentChange() {
 		setIsLoading(true);
@@ -57,34 +153,6 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 		setIsLoading(false);
 	}
 
-	/* 	inline-flex  border  w-full max-w-full items-center", "justify-between cursor-pointer rounded-xl gap-2 p-4"
-	 */
-
-	let months = [
-		{ name: "January", days: 31 },
-		{ name: "February", days: 28 },
-		{ name: "March", days: 31 },
-		{ name: "April", days: 30 },
-		{ name: "May", days: 31 },
-		{ name: "June", days: 30 },
-		{ name: "July", days: 31 },
-		{ name: "August", days: 31 },
-		{ name: "September", days: 30 },
-		{ name: "October", days: 31 },
-		{ name: "November", days: 30 },
-		{ name: "December", days: 31 },
-	];
-
-	const isLeapYear = (year: number) => {
-		return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-	};
-
-	if (isLeapYear(selectedElection.election_year)) {
-		months[1].days = 29;
-	}
-
-	const isElectionRunning = isVotingRunning(selectedElection);
-
 	async function setElectionDateHandler() {
 		setIsLoading(true);
 		const res = await updateElectionDate(selectedElection.id, debouncedElectionDate);
@@ -95,48 +163,6 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 		}
 		router.refresh();
 		setIsLoading(false);
-	}
-
-	function handleStartTimeChange(value: string, type: "hour" | "minute") {
-		if (type === "hour") {
-			setElectionStartTime(`${value}:${electionStartTime.split(":")[1]}`);
-			if (parseInt(electionEndTime.split(":")[0]) < parseInt(value)) {
-				setElectionEndTime(`${value}:${electionEndTime.split(":")[1]}`);
-			}
-			if (parseInt(electionEndTime.split(":")[0]) === parseInt(value) && parseInt(electionEndTime.split(":")[1]) < parseInt(electionStartTime.split(":")[1])) {
-				setElectionEndTime(`${value}:${electionStartTime.split(":")[1]}`);
-			}
-		} else {
-			setElectionStartTime(`${electionStartTime.split(":")[0]}:${value}`);
-			if (parseInt(electionEndTime.split(":")[0]) === parseInt(electionStartTime.split(":")[0]) && parseInt(electionEndTime.split(":")[1]) < parseInt(value)) {
-				setElectionEndTime(`${electionEndTime.split(":")[0]}:${value}`);
-			}
-		}
-	}
-
-	function handleEndTimeChange(value: string, type: "hour" | "minute") {
-		if (type === "hour") {
-			if (parseInt(value) < parseInt(electionStartTime.split(":")[0])) {
-				setElectionEndTime(electionStartTime);
-				return;
-			}
-			setElectionEndTime(`${value}:${electionEndTime.split(":")[1]}`);
-		} else {
-			setElectionEndTime(`${electionEndTime.split(":")[0]}:${value}`);
-		}
-	}
-
-	let startHours = Array.from({ length: 24 }, (_, i) => i);
-	let startMinutes = Array.from({ length: 60 }, (_, i) => i);
-
-	let endHours = Array.from({ length: 24 }, (_, i) => i);
-	let endMinutes = Array.from({ length: 60 }, (_, i) => i);
-
-	//remove end hours which are less than start hours
-	endHours = endHours.filter((hour) => hour >= parseInt(electionStartTime.split(":")[0]));
-	//if end hour and start hour same end minute should be greater than start minute
-	if (parseInt(electionEndTime.split(":")[0]) === parseInt(electionStartTime.split(":")[0])) {
-		endMinutes = endMinutes.filter((minute) => minute > parseInt(electionStartTime.split(":")[1]));
 	}
 
 	async function updateStartTimeHandler() {
@@ -191,6 +217,55 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 		setPassword("");
 	}
 
+	function handleStartTimeChange(value: string, type: "hour" | "minute") {
+		if (type === "hour") {
+			setElectionStartTime(`${value}:${electionStartTime.split(":")[1]}`);
+			if (parseInt(electionEndTime.split(":")[0]) < parseInt(value)) {
+				setElectionEndTime(`${value}:${electionEndTime.split(":")[1]}`);
+			}
+			if (parseInt(electionEndTime.split(":")[0]) === parseInt(value) && parseInt(electionEndTime.split(":")[1]) < parseInt(electionStartTime.split(":")[1])) {
+				setElectionEndTime(`${value}:${electionStartTime.split(":")[1]}`);
+			}
+		} else {
+			setElectionStartTime(`${electionStartTime.split(":")[0]}:${value}`);
+			if (parseInt(electionEndTime.split(":")[0]) === parseInt(electionStartTime.split(":")[0]) && parseInt(electionEndTime.split(":")[1]) < parseInt(value)) {
+				setElectionEndTime(`${electionEndTime.split(":")[0]}:${value}`);
+			}
+		}
+	}
+
+	function handleEndTimeChange(value: string, type: "hour" | "minute") {
+		if (type === "hour") {
+			if (parseInt(value) < parseInt(electionStartTime.split(":")[0])) {
+				setElectionEndTime(electionStartTime);
+				return;
+			}
+			setElectionEndTime(`${value}:${electionEndTime.split(":")[1]}`);
+		} else {
+			setElectionEndTime(`${electionEndTime.split(":")[0]}:${value}`);
+		}
+	}
+
+	function ButtonCard({ title, description, children, className = "" }) {
+		return (
+			<div className={cn("w-full bg-content1/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border", className)}>
+				<div className="flex flex-col my-auto">
+					<p className="text-medium">{title}</p>
+					<p className="text-small text-default-500">{description}</p>
+				</div>
+				{children}
+			</div>
+		);
+	}
+
+	function SectionTitle({ children, href = "" }) {
+		return (
+			<Link showAnchorIcon={href !== ""} href={href} className="px-4 py-2">
+				{children}
+			</Link>
+		);
+	}
+
 	useEffect(() => {
 		if (debouncedElectionDate !== selectedElection.election_date) {
 			setElectionDateHandler();
@@ -209,26 +284,27 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 		}
 	}, [debouncedElectionEndTime]);
 
-	function ChangeCurrentModal() {
+	function PublishResultsModal() {
 		return (
-			<Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
+			<Modal disableAnimation key="PublishResultsModal" onClose={() => setIsPublishModalOpen(false)} isOpen={isPublishModalOpen}>
 				<ModalContent>
-					<ModalHeader className="flex flex-col gap-1">Change Current Election</ModalHeader>
-					<ModalBody>Are you sure you want to set the {selectedElection.election_year} election as current?</ModalBody>
+					<ModalHeader className="flex flex-col gap-1">Publish Results</ModalHeader>
+					<ModalBody>
+						<p>Are you sure you want to publish the results of the {selectedElection.election_year} elections?</p>
+						<Input autoFocus key="PublishResultsModalInput" value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
+					</ModalBody>
 					<ModalFooter>
-						<Button onPress={() => setIsModalOpen(false)} color="danger" variant="light">
+						<Button onPress={() => setIsPublishModalOpen(false)} color="danger" variant="light">
 							Close
 						</Button>
-						<Button isDisabled={selectedElection.is_current} onPress={handleCurrentChange} color="primary">
-							Confirm
+						<Button isDisabled={selectedElection.publish_results} onPress={handleCurrentChange} color="primary">
+							Publish
 						</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
 		);
 	}
-
-	const numberOfCandidates = selectedElection._count.Candidate;
 
 	return (
 		<>
@@ -262,7 +338,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 			</Modal>
 			<Modal
 				onClose={() => {
-					setIsDeleteModalOpen(false);
+					setIsDeleteElectionModalOpen(false);
 					setPassword("");
 				}}
 				isOpen={isDeleteModalOpen}>
@@ -275,7 +351,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					<ModalFooter>
 						<Button
 							onPress={() => {
-								setIsDeleteModalOpen(false);
+								setIsDeleteElectionModalOpen(false);
 								setPassword("");
 							}}
 							color="danger"
@@ -288,7 +364,24 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
-			<ChangeCurrentModal />
+			<Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
+				<ModalContent>
+					<ModalHeader className="flex flex-col gap-1">Change Current Election</ModalHeader>
+					<ModalBody>
+						<p>Are you sure you want to set the {selectedElection.election_year} election as current?</p>
+						<Input value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
+					</ModalBody>
+					<ModalFooter>
+						<Button onPress={() => setIsModalOpen(false)} color="danger" variant="light">
+							Close
+						</Button>
+						<Button isDisabled={selectedElection.is_current} onPress={handleCurrentChange} color="primary">
+							Confirm
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			<PublishResultsModal />
 			<div className="w-full bg-transparent">
 				<form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
 					<div className="w-full flex-col gap-2  bg-content1/60 p-4 flex md:flex-col rounded-xl border">
@@ -301,103 +394,76 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 							</div>
 						</div>
 					</div>
-					<div className="w-full bg-content1/60 flex-row flex p-4 rounded-xl border">
-						<div className="flex flex-col">
-							<p className="text-medium">Current Election</p>
-							<p className="text-small text-default-500">Set the election as current</p>
+					<div>
+						<SectionTitle>Main Settings</SectionTitle>
+						<div className="gap-4 auto-rows-fr grid md:grid-cols-2">
+							<ButtonCard title="Election Date">
+								<Input isRequired value={electionDate} onChange={(e) => setElectionDate(e.target.value)} placeholder=" " label="Day and Month" isDisabled={isLoading} className="md:max-w-[300px] my-auto ml-auto" type="date" min={`${selectedElection.election_year}-01-01`} max={`${selectedElection.election_year}-12-31`} />
+							</ButtonCard>
+							<ButtonCard title="Current Election" description="Set the election as current">
+								<Button onPress={() => setIsModalOpen(true)} isDisabled={isLoading || selectedElection.is_current} className="ml-auto my-auto md:w-auto w-full rounded-full" color="danger">
+									{selectedElection.is_current ? "Current Election" : "Set as Current"}
+								</Button>
+							</ButtonCard>
+							<SwitchCell isDisabled={isLoading || selectedElection.is_current} onValueChange={handleVisibilityChange} defaultSelected={selectedElection.is_visible} label="Visible" description="Show the election on the public website" />
+							<SwitchCell isDisabled={isLoading || !selectedElection.is_current} onValueChange={handleForceChange} defaultSelected={selectedElection.forceEnabled} label="Force Voting On" />
+							<ButtonCard title="Publish Results" description="Stop the election and publish the results publicly on the website. How many votes each candidates got won't be shown.">
+								<Button onPress={() => setIsPublishModalOpen(true)} isDisabled={isLoading || selectedElection.publish_results} className="ml-auto my-auto md:w-auto w-full min-w-max rounded-full" color="success">
+									{selectedElection.publish_results ? "Results Published" : "Publish Results"}
+								</Button>
+							</ButtonCard>
 						</div>
-						<Button onPress={() => setIsModalOpen(true)} isDisabled={isLoading || selectedElection.is_current} className="ml-auto my-auto" color="danger">
-							{selectedElection.is_current ? "Current Election" : "Set as Current"}
-						</Button>
 					</div>
-					<SwitchCell isDisabled={isLoading || selectedElection.is_current} onValueChange={handleVisibilityChange} defaultSelected={selectedElection.is_visible} label="Visible" description="Show the election on the public website" />
-					<SwitchCell isDisabled={isLoading || !selectedElection.is_current} onValueChange={handleForceChange} defaultSelected={selectedElection.forceEnabled} label="Force Voting On" description="Let people vote even outside of the scheduled time" />
-					<div className="w-full bg-content1/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border">
-						<div className="flex flex-col my-auto">
-							<p className="text-medium">Election Date</p>
-							<p className="text-small text-default-500">The day the election will be held on</p>
-						</div>
-						<Input isRequired startContent="" value={electionDate} onChange={(e) => setElectionDate(e.target.value)} isDisabled={isLoading} label="Election Day" placeholder=" " className="md:max-w-[300px] my-auto ml-auto" type="date" min={`${selectedElection.election_year}-01-01`} max={`${selectedElection.election_year}-12-31`} />
-					</div>
-					<SwitchCell isDisabled={isLoading} onValueChange={handleAutomaticChange} defaultSelected={selectedElection.autoEnabled} description="Automatically start and end the voting based on the specified times." label="Automatic Scheduled Voting" />
-					<div className="w-full bg-content1/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border">
-						<div className="flex flex-col my-auto">
-							<div className="flex gap-2">
-								<p className="text-medium">Automatic Election Schedule</p>
-								{selectedElection.autoEnabled ? (
-									<Chip className="relative" color="success" size="sm">
-										Active
-									</Chip>
-								) : (
-									<Chip className="relative" color="danger" size="sm">
-										Not Active
-									</Chip>
-								)}
+					<div className="flex flex-col">
+						<SectionTitle>Scheduled Election Settings</SectionTitle>
+						<SwitchCellTop isDisabled={isLoading} onValueChange={handleAutomaticChange} defaultSelected={selectedElection.autoEnabled} description="Automatically start and end the voting based on the specified times." label="Automatic Scheduled Voting" />
+						<ButtonCard title="Automatic Election Schedule" description="The day the election will be held on" className="rounded-t-none border-t-0">
+							<div className="md:ml-auto my-auto flex">
+								<Select label="Start Hour" selectedKeys={[electionStartTime.split(":")[0]]} onChange={(e) => handleStartTimeChange(e.target.value, "hour")} classNames={{ trigger: "rounded-r-none" }} className="md:w-[150px]">
+									{startHours.map((hour) => {
+										return <SelectItem key={hour}>{hour}</SelectItem>;
+									})}
+								</Select>
+								<Select label="Minute" defaultSelectedKeys={[electionStartTime.split(":")[1]]} onChange={(e) => handleStartTimeChange(e.target.value, "minute")} classNames={{ trigger: "rounded-l-none" }} className="md:w-[150px]">
+									{startMinutes.map((minute) => {
+										return <SelectItem key={minute}>{minute}</SelectItem>;
+									})}
+								</Select>
 							</div>
-							<p className="text-small text-default-500">The "Automatic Scheduled Voting" setting.</p>
-						</div>
-						<div className="md:ml-auto my-auto flex">
-							<Select label="Start Hour" selectedKeys={[electionStartTime.split(":")[0]]} onChange={(e) => handleStartTimeChange(e.target.value, "hour")} classNames={{ trigger: "rounded-r-none" }} className="md:w-[150px]">
-								{startHours.map((hour) => {
-									const formattedHour = hour.toString().padStart(2, "0");
-									return (
-										<SelectItem key={formattedHour} value={formattedHour}>
-											{formattedHour}
-										</SelectItem>
-									);
-								})}
-							</Select>
-							<Select label="Minute" defaultSelectedKeys={[electionStartTime.split(":")[1]]} onChange={(e) => handleStartTimeChange(e.target.value, "minute")} classNames={{ trigger: "rounded-l-none" }} className="md:w-[150px]">
-								{startMinutes.map((minute) => {
-									const formattedMinute = minute.toString().padStart(2, "0");
-									return (
-										<SelectItem key={formattedMinute} value={formattedMinute}>
-											{formattedMinute}
-										</SelectItem>
-									);
-								})}
-							</Select>
-						</div>
-						<div className="my-auto flex">
-							<Select label="End Hour" defaultSelectedKeys={[electionEndTime.split(":")[0]]} onChange={(e) => handleEndTimeChange(e.target.value, "hour")} classNames={{ trigger: "rounded-r-none" }} className="md:w-[150px] my-auto">
-								{endHours.map((hour) => {
-									const formattedHour = hour.toString().padStart(2, "0");
-									return (
-										<SelectItem key={formattedHour} value={formattedHour}>
-											{formattedHour}
-										</SelectItem>
-									);
-								})}
-							</Select>
-							<Select label="Minute" defaultSelectedKeys={[electionEndTime.split(":")[1]]} onChange={(e) => handleEndTimeChange(e.target.value, "minute")} classNames={{ trigger: "rounded-l-none" }} className="md:w-[150px] my-auto">
-								{endMinutes.map((minute) => {
-									const formattedMinute = minute.toString().padStart(2, "0");
-									return (
-										<SelectItem key={formattedMinute} value={formattedMinute}>
-											{formattedMinute}
-										</SelectItem>
-									);
-								})}
-							</Select>
-						</div>
+							<div className="my-auto flex">
+								<Select label="End Hour" defaultSelectedKeys={[electionEndTime.split(":")[0]]} onChange={(e) => handleEndTimeChange(e.target.value, "hour")} classNames={{ trigger: "rounded-r-none" }} className="md:w-[150px] my-auto">
+									{endHours.map((hour) => {
+										return <SelectItem key={hour}>{hour}</SelectItem>;
+									})}
+								</Select>
+								<Select label="Minute" defaultSelectedKeys={[electionEndTime.split(":")[1]]} onChange={(e) => handleEndTimeChange(e.target.value, "minute")} classNames={{ trigger: "rounded-l-none" }} className="md:w-[150px] my-auto">
+									{endMinutes.map((minute) => (
+										<SelectItem key={minute}>{minute}</SelectItem>
+									))}
+								</Select>
+							</div>
+						</ButtonCard>
 					</div>
-					<div className="w-full bg-content1/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border">
-						<div className="flex flex-col my-auto">
-							<p className="text-medium">Delete All Votes</p>
-							<p className="text-small text-default-500">Deletes all votes from the election</p>
-						</div>
-						<Button isDisabled={isElectionRunning} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto" color="danger">
-							{isElectionRunning ? "Election Currently Running" : "Delete"}
-						</Button>
+					<div className="flex flex-col">
+						<SectionTitle>Candidate Permissions</SectionTitle>
+						<SwitchCellTop isDisabled={isLoading} onValueChange={handleAllowBioChange} defaultSelected={selectedElection.edit_bio} description="Allow candidates to edit their biographies" label="Allow Biography Editing" />
+						<SwitchCellMiddle isDisabled={isLoading} onValueChange={handleAllowEditSloganChange} defaultSelected={selectedElection.edit_slogan} description="Allow candidates to edit their slogans" label="Allow Slogan Editing" />
+						<SwitchCellMiddle isDisabled={isLoading} onValueChange={handleAllowEditSocialsChange} defaultSelected={selectedElection.edit_socials} description="Allow candidates to edit their socials" label="Allow Social Media Editing" />
+						<SwitchCellMiddle isDisabled={isLoading} onValueChange={handleAllowEditPhotoChange} defaultSelected={selectedElection.edit_photo} description="Allow candidates to edit their photos" label="Allow Photo Editing" />
+						<SwitchCellBottom isDisabled={isLoading} onValueChange={handleAllowEditQuestionsChange} defaultSelected={selectedElection.edit_questions} description="Allow candidates to edit their questions" label="Allow Question Editing" />
 					</div>
-					<div className="w-full bg-red-800/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border-neutral-500 border">
-						<div className="flex flex-col my-auto">
-							<p className="text-medium">Delete Election</p>
-							<p className="text-small text-default-500">Deletes the whole election, requires all candidates to be deleted.</p>
-						</div>
-						<Button color="primary" isDisabled={isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto">
-							{isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled ? "Election Currently Can't Be Deleted" : "Delete"}
-						</Button>
+					<div>
+						<SectionTitle>Danger Zone</SectionTitle>
+						<ButtonCard title="Delete All Votes" description="Deletes all votes from the election" className="rounded-b-none bg-red-800/60 border-neutral-500">
+							<Button color="primary" isDisabled={isElectionRunning} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto ">
+								{isElectionRunning ? "Election Currently Running" : "Delete"}
+							</Button>
+						</ButtonCard>
+						<ButtonCard title="Delete Election" description="Deletes the whole election, requires all candidates to be deleted." className="rounded-t-none border-t-0 bg-red-800/60 border-neutral-500">
+							<Button color="primary" isDisabled={isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto">
+								{isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled ? "Election Currently Can't Be Deleted" : "Delete"}
+							</Button>
+						</ButtonCard>
 					</div>
 				</form>
 			</div>
@@ -406,16 +472,28 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 }
 
 /* model Election {
-   id                String      @id @unique @default(uuid())
-   election_year     String      @unique
-   is_current        Boolean     @default(false)
-   forceEnabled      Boolean     @default(false)
-   autoEnabled       Boolean     @default(true)
-   blocked           Boolean     @default(false)
-   total_voters      Int?
-   description       String?
-   voting_end_date   DateTime?
-   publish_results   Boolean     @default(false)
-   is_visible        Boolean     @default(false)
-   Candidate         Candidate[]
+   id                 String      @id @unique @default(uuid())
+   election_date      String?
+   election_year      String      @unique
+   is_current         Boolean     @default(false)
+   forceEnabled       Boolean     @default(false)
+   autoEnabled        Boolean     @default(false)
+   blocked            Boolean     @default(false)
+   total_voters       Int?
+   description        String?
+   voting_start_time  String?
+   voting_end_time    String?
+   publish_results    Boolean     @default(false)
+   is_visible         Boolean     @default(false)
+   //
+   edit_bio           Boolean     @default(true)
+   edit_slogan        Boolean     @default(true)
+   edit_socials       Boolean     @default(true) //includes social media and video; speech is added by admin
+   edit_photo         Boolean     @default(true)
+   edit_questions     Boolean     @default(true)
+   //
+   candidates_visible Boolean     @default(false)
+   //
+   Candidate          Candidate[]
+   Question           Question[]
 } */

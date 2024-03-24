@@ -36,7 +36,7 @@ export const authConfig: NextAuthConfig = {
 					if (!isValid) {
 						return null;
 					}
-					const userObject = { fullName: adminUser.fullName, email: adminUser.email, admin: { id: adminUser.id }, student: { studentId: username.replace("@englishschool.ac.cy", ""), yearGroup: "7" } };
+					const userObject = { fullName: adminUser.fullName, email: adminUser.email, admin: { id: adminUser.id }, student: { studentId: username.replace("@englishschool.ac.cy", ""), yearGroup: "7" }, candidate: { id: username.replace("@englishschool.ac.cy", ""), type: "BOY" } };
 					return userObject;
 				}
 

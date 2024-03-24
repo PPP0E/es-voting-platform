@@ -53,3 +53,12 @@ export function EditButton({ id }) {
 
 	return <Button onPress={editFaqHandler} isIconOnly endContent={<Icon className="" icon="solar:pen-new-square-outline" width={22} />} fullWidth className="border-small border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto"></Button>;
 }
+
+export function AnswersButton({ id }) {
+	const router = useRouter();
+	function editAnswersHandler() {
+		updateSearchParams({ answers: id }, router);
+	}
+
+	return <Button onPress={editAnswersHandler} isIconOnly endContent={<Icon className="" icon="solar:question-circle-outline" width={22} />} fullWidth className="border-small border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto"></Button>;
+}

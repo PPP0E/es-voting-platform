@@ -75,6 +75,7 @@ export async function deleteQuestion(id: string, electionYear: string) {
 			...currentQuestions.filter((question) => question.id !== id).map((question, index) => prisma.question.update({ where: { id: question.id, election: { election_year: electionYear } }, data: { index } })),
 		]);
 	} catch (e) {
+		console.log(e);
 		return { ok: false, message: "An error occurred while deleting the question" };
 	}
 	return { ok: true, message: "Question deleted successfully" };
@@ -113,14 +114,6 @@ export async function addQuestion(formData: FormData) {
 	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
 	let schema = z.object({
 		title: z.string({ required_error: "Title is required" }).min(1).max(100, "Title can't be longer than 100 characters").trim(),
-		content: z
-			.string()
-			.trim()
-			.max(500, "Content can't be longer than 500 characters")
-			.optional()
-			.nullable()
-			.default(null)
-			.transform((v) => (v === undefined ? null : v)),
 		electionYear: z.string().min(4).max(4),
 	});
 	let parsedData;

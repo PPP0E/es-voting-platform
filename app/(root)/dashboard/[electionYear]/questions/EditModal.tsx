@@ -37,7 +37,6 @@ export default function Component({ question }) {
 				<ModalHeader className="flex flex-col gap-1">Edit Question</ModalHeader>
 				<ModalBody id="main" as="form" action={editQuestionHandler}>
 					<Input maxLength={100} isRequired defaultValue={question?.title} size="lg" label="Title" name="title" />
-					<Textarea maxLength={500} defaultValue={question?.content} size="lg" label="Details" name="content" />
 				</ModalBody>
 				<ModalFooter>
 					<Button isLoading={isLoading} color="danger" variant="light" onPress={() => removeSearchParams({ edit: "" }, router)}>

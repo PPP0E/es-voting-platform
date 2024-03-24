@@ -161,7 +161,7 @@ export default async function Component({ params }) {
 					return (
 						<li key={index} className="w-full flex-col gap-2 bg-content1/60 p-4 flex md:flex-col rounded-xl border">
 							<div className="flex">
-								<Avatar isBordered className="my-auto mr-4 ml-1" src={`/api/users/${candidate.id}/avatar`} />
+								<Avatar isBordered showFallback className="my-auto mr-4 ml-1" src={`/api/users/${candidate.id}/avatar`} />
 								<div className="flex flex-col gap-1">
 									<div className="flex gap-2">
 										<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{fullName}</p>

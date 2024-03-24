@@ -5,6 +5,33 @@ import { verifyPassword } from "@/lib/auth";
 import { isVotingRunning } from "@/lib/isVotingRunning";
 import prisma from "@/prisma/client";
 
+/* model Election {
+   id                 String      @id @unique @default(uuid())
+   election_date      String?
+   election_year      String      @unique
+   is_current         Boolean     @default(false)
+   forceEnabled       Boolean     @default(false)
+   autoEnabled        Boolean     @default(false)
+   blocked            Boolean     @default(false)
+   total_voters       Int?
+   description        String?
+   voting_start_time  String?
+   voting_end_time    String?
+   publish_results    Boolean     @default(false)
+   is_visible         Boolean     @default(false)
+   //
+   edit_bio           Boolean     @default(true)
+   edit_slogan        Boolean     @default(true)
+   edit_socials       Boolean     @default(true) //includes social media and video; speech is added by admin
+   edit_photo         Boolean     @default(true)
+   edit_questions     Boolean     @default(true)
+   //
+   candidates_visible Boolean     @default(false)
+   //
+   Candidate          Candidate[]
+   Question           Question[]
+} */
+
 export async function currentChange(electionId: string, e: any) {
 	const session = await auth();
 	if (!session) return { ok: false, message: "Unauthorized" };
@@ -67,6 +94,81 @@ export async function forceChange(electionId: string, e: any) {
 	});
 }
 
+export async function allowEditBio(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	await prisma.election.update({
+		where: {
+			id: electionId,
+		},
+		data: {
+			edit_bio: e,
+		},
+	});
+	return { ok: true };
+}
+
+export async function allowEditSlogan(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	await prisma.election.update({
+		where: {
+			id: electionId,
+		},
+		data: {
+			edit_slogan: e,
+		},
+	});
+	return { ok: true, message: "Slogan editing enabled" };
+}
+
+export async function allowEditSocials(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	await prisma.election.update({
+		where: {
+			id: electionId,
+		},
+		data: {
+			edit_socials: e,
+		},
+	});
+	return { ok: true, message: "Socials editing enabled" };
+}
+
+export async function allowEditPhoto(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	await prisma.election.update({
+		where: {
+			id: electionId,
+		},
+		data: {
+			edit_photo: e,
+		},
+	});
+	return { ok: true, message: "Photo editing enabled" };
+}
+
+export async function allowEditQuestions(electionId: string, e: any) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+	await prisma.election.update({
+		where: {
+			id: electionId,
+		},
+		data: {
+			edit_questions: e,
+		},
+	});
+	return { ok: true, message: "Question editing enabled" };
+}
+
 export async function visibility(electionId: string, e: any) {
 	const session = await auth();
 	if (!session) return { ok: false, message: "Unauthorized" };
@@ -87,6 +189,7 @@ export async function visibility(electionId: string, e: any) {
 			is_visible: e,
 		},
 	});
+	return { ok: true, message: "Election visibility changed" };
 }
 
 export async function updateElectionDate(electionId: string, date: string) {

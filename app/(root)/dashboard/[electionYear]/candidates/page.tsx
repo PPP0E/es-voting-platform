@@ -2,7 +2,7 @@ import prisma from "@/prisma/client";
 import { Link } from "@nextui-org/link";
 import { Chip } from "@nextui-org/chip";
 import { redirect } from "next/navigation";
-import { DeleteButton, EditButton, MoveDownButton, MoveUpButton } from "./Buttons";
+import { AnswersButton, DeleteButton, EditButton, MoveDownButton, MoveUpButton } from "./Buttons";
 import { ButtonGroup } from "@nextui-org/button";
 import { Avatar } from "@nextui-org/avatar";
 import { isVotingRunning } from "@/lib/isVotingRunning";
@@ -11,6 +11,7 @@ import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
 import { Button } from "@nextui-org/button";
 import Icon from "@/components/ui/Icon";
+import { QuestionsModal } from "./QuestionsModal";
 
 export default async function Component({ params, searchParams }) {
 	const { electionYear } = params;
@@ -19,6 +20,11 @@ export default async function Component({ params, searchParams }) {
 			election_year: electionYear,
 		},
 		include: {
+			Question: {
+				orderBy: {
+					index: "asc",
+				},
+			},
 			Candidate: {
 				orderBy: {
 					officialName: "asc",
@@ -47,7 +53,32 @@ export default async function Component({ params, searchParams }) {
 		},
 	});
 
+	const questions = selectedElection.Question;
+
 	const selectedEditCandidate = selectedElection.Candidate.find((candidate) => candidate.id === searchParams.edit);
+	const selectedCandidateAnswers = selectedElection.Candidate.find((candidate) => candidate.id === searchParams.answers);
+
+	let answers = [];
+	if (selectedCandidateAnswers) {
+		answers = await prisma.answer.findMany({
+			where: {
+				candidateId: selectedCandidateAnswers.id,
+				candidate: {
+					election: {
+						election_year: electionYear,
+					},
+				},
+			},
+			include: {
+				question: true,
+			},
+			orderBy: {
+				question: {
+					index: "asc",
+				},
+			},
+		});
+	}
 
 	const votingRunning = isVotingRunning(selectedElection);
 
@@ -55,6 +86,7 @@ export default async function Component({ params, searchParams }) {
 		<>
 			<AddModal isBlocked={selectedElection.blocked} selectedElectionYear={selectedElection.election_year} />
 			<EditModal candidate={selectedEditCandidate} />
+			<QuestionsModal candidate={selectedCandidateAnswers} selectedElection={selectedElection} questions={questions} answers={answers} />
 			<DeleteModal />
 			<div>
 				<ul className="w-full grid gap-4">
@@ -75,6 +107,7 @@ export default async function Component({ params, searchParams }) {
 								<div className="flex gap-2 ml-auto my-auto">
 									<Button as={Link} href={`/elections/${electionYear}/candidates/${candidate.slug || candidate.id}`} isIconOnly endContent={<Icon className="" icon="solar:user-outline" width={22} />} fullWidth className="border-small border-black/10 bg-black/10 shadow-md light:text-black dark:border-white/20 dark:bg-white/10 w-auto"></Button>
 									<EditButton id={candidate.id} />
+									<AnswersButton id={candidate.id} />
 									{!selectedElection.blocked && !votingRunning && <DeleteButton id={candidate.id} />}
 								</div>
 							</li>

@@ -11,7 +11,6 @@ import Confetti from "@/components/ui/confetti";
 import { redirect } from "next/navigation";
 
 export default function Component({ election, hideDescription = false, hideButtons = false }) {
-	if (!election) redirect("/elections");
 	return (
 		<>
 			{election.publish_results && <Confetti />}
@@ -44,7 +43,7 @@ export default function Component({ election, hideDescription = false, hideButto
 					)}
 				</div>
 				{!!election.Candidate.length && (
-					<div className="mt-12 grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+					<div className="mt-12 grid w-full grid-cols-1 gap-4 auto-rows-fr md:grid-cols-2 lg:grid-cols-3">
 						{election.Candidate.map((member, index) => (
 							<TeamMemberCard electionYear={election.election_year} index={index} key={index} {...member} />
 						))}

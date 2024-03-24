@@ -27,9 +27,9 @@ export default async function Component({ searchParams }) {
 									<Chip color="primary" className="rounded-lg">
 										{faq.index + 1}
 									</Chip>
-									<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{faq.title}</p>
+									<h2 className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{faq.title}</h2>
 								</div>
-								<h1 className="text-default-400 mt-1">{faq.content}</h1>
+								<p className="text-default-400 mt-1">{faq.content}</p>
 							</div>
 							<div className="flex gap-2 ml-auto my-auto">
 								<EditButton id={faq.id} />

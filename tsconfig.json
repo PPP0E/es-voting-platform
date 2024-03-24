@@ -21,6 +21,6 @@
 			}
 		]
 	},
-	"include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "auth.js", "lib/useScrollPosition.js", "middleware.js"],
+	"include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "auth.js", "lib/useScrollPosition.js", "middleware.js", "tailwind.config.js"],
 	"exclude": ["node_modules"]
 }

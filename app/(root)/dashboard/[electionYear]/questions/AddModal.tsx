@@ -37,7 +37,6 @@ export default function Component({ selectedElectionYear }) {
 				<ModalHeader className="flex flex-col gap-1">Add Question</ModalHeader>
 				<ModalBody id="main" as="form" action={addQuestionHandler}>
 					<Input maxLength={100} isRequired size="lg" label="Title" name="title" />
-					<Textarea maxLength={500} size="lg" label="Details" name="content" />
 				</ModalBody>
 				<ModalFooter>
 					<Button isLoading={isLoading} color="danger" variant="light" onPress={() => removeSearchParams({ add: "" }, router)}>

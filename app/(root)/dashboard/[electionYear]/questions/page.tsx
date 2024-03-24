@@ -21,14 +21,13 @@ export default async function Component({ searchParams, params }) {
 				<ul className="w-full grid gap-4">
 					{questions.map((question, index) => (
 						<li key={index} className="w-full flex-col gap-2 bg-content1/60 p-4 flex md:flex-row rounded-xl border">
-							<div className={`flex gap-1 ${question.content ? "flex-col" : "flex-row"}`}>
+							<div className={`flex gap-1 flex-row`}>
 								<div className="flex gap-2 h-full flex-col md:flex-row">
 									<Chip color="primary" className="rounded-lg my-auto">
 										{question.index + 1}
 									</Chip>
 									<p className="bg-gradient-to-br from-foreground-800 my-auto to-foreground-500 bg-clip-text text-xl font-semibold tracking-tight text-transparent dark:to-foreground-200">{question.title}</p>
 								</div>
-								<h1 className="text-default-400 mt-1">{question.content}</h1>
 							</div>
 							<div className="flex gap-2 ml-auto my-auto">
 								<EditButton id={question.id} />

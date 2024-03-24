@@ -284,3 +284,35 @@ export async function deleteProfilePicture(candidateId) {
 	}
 	return { ok: true, message: "Photo deleted successfully" };
 }
+
+export async function addCandidateAnswers(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session.user.admin) return { ok: false, message: "Unauthorized" };
+
+	const electionYear = formData.get("electionYear") as string;
+	const candidateId = formData.get("candidateId") as string;
+
+	const formDataEntries = Array.from(formData.entries());
+	const answersArray = formDataEntries
+		.filter(([key]) => key !== "electionYear" && key !== "candidateId")
+		.map(([key, value]) => {
+			return { question_id: key, answer: value as string };
+		})
+		.filter(({ answer }) => answer.trim().length > 0);
+
+	await prisma.$transaction([
+		prisma.answer.deleteMany({ where: { candidate: { id: candidateId, election: { election_year: electionYear } } } }),
+		...answersArray.map((answer) =>
+			prisma.answer.create({
+				data: {
+					candidate: { connect: { id: candidateId } },
+					question: { connect: { id: answer.question_id } },
+					content: answer.answer,
+				},
+			})
+		),
+	]);
+
+	return { ok: true, message: "Answers added successfully" };
+}
