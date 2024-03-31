@@ -25,6 +25,7 @@ const { auth } = NextAuth({
 		},
 	},
 	providers: [],
+	secret: process.env.AUTH_SECRET,
 	logger: {
 		error: () => {},
 		warn: () => {},
