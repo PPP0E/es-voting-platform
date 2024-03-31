@@ -28,4 +28,8 @@ export async function addElection(formData: FormData) {
 			election_year: result.data.election_year,
 		},
 	});
+	return {
+		ok: true,
+		message: "Election added successfully",
+	};
 }

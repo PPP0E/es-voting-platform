@@ -9,7 +9,7 @@ export async function vote(formData: FormData) {
 	const session = await auth();
 	if (!session) return { ok: false, message: "You are not logged in" };
 	if (!session.user.student) return { ok: false, message: "You are not a student" };
-	const studentId = session.user.student.studentId;
+	const studentId = session.user.student.id;
 	if (!studentId) return { ok: false, message: "You are not a student" };
 	const currentElection = await prisma.election.findFirst({
 		where: {

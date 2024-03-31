@@ -49,7 +49,7 @@ export default function Component({ faqsCount }) {
 									<p className="font-thin">Signed in as</p> <p className="font-semibold">{fullName}</p>
 									{session.user.student == "student" && (
 										<p className="font-semibold">
-											{session.user.student.studentId} • Year {session.user.student.yearGroup}
+											{session.user.student.id} • Year {session.user.student.yearGroup}
 										</p>
 									)}
 									{session.user.admin && (

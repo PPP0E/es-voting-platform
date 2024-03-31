@@ -13,7 +13,6 @@ export async function studentLoginHandler(formData: any) {
 			username: enteredEmail,
 			password: enteredPassword,
 			userType: "student",
-			redirectTo: "/",
 		});
 	} catch (error) {
 		return { ok: false, error: "An error occurred while trying to login." };

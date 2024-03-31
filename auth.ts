@@ -4,6 +4,11 @@ import { Dispatcher, request } from "undici";
 import type { NextAuthConfig } from "next-auth";
 import prisma from "@/prisma/client";
 import { verifyPassword } from "@/lib/auth";
+import { $Enums } from "@prisma/client";
+
+function isEmptyObject(obj) {
+	return Object.keys(obj).length === 0;
+}
 
 export const authConfig: NextAuthConfig = {
 	session: {
@@ -19,97 +24,138 @@ export const authConfig: NextAuthConfig = {
 				password: { label: "password", type: "password" },
 			},
 			async authorize(credentials) {
-				let { username, password } = credentials;
+				let { username, password } = credentials as Partial<Record<"username" | "password", string>>;
 
-				let adminUser: { fullName: string; email: string; password: string; id: string } | null = null;
-				try {
-					adminUser = await prisma.admin.findUnique({
-						where: {
-							email: username as string,
-						},
-					});
-				} catch (error) {
-					return null;
-				}
-				if (adminUser) {
-					const isValid = await verifyPassword(password as string, adminUser.password);
-					if (!isValid) {
-						return null;
-					}
-					const userObject = { fullName: adminUser.fullName, email: adminUser.email, admin: { id: adminUser.id }, student: { studentId: username.replace("@englishschool.ac.cy", ""), yearGroup: "7" }, candidate: { id: username.replace("@englishschool.ac.cy", ""), type: "BOY" } };
-					return userObject;
-				}
-
-				username = (username as string)
+				password = password.trim();
+				username = username
 					.trim()
 					.toLowerCase()
 					.replace(/@englishschool.ac.cy$/, "");
 
-				password = (password as string).trim();
+				if (!username || !password) return null;
+				const isSchoolId = /^s\d{2}[1-7]\d{3}$/.test(username as string);
+				let studentUserObject: { fullName: string; email: string; profilePictureUrl: string }, studentObject: { id: string; yearGroup: string; formGroup: string };
+				let adminUserObject: { fullName: any; email: any }, adminObject: { id: any }, adminQuery: { password: any; fullName: any; email: any; id: any };
+				let candidateUserObject: { fullName: string; email: any; password: any; id: any }, candidateObject: { id: any }, candidateQuery: { officialName: any; officialSurname: any; schoolEmail?: any; password?: any; id: any; slug?: string; type?: $Enums.CandidateType; student_id?: string; bio?: string; slogan?: string; instagram?: string; facebook?: string; twitter?: string; bereal?: string; snapchat?: string; website?: string; youtube?: string; video_url?: string; speech_url?: string; photo?: string; file?: string; views?: number; election_id?: string };
 
-				const isValidUsername = /^s\d{2}[1-7]\d{3}$/.test(username as string);
+				const studentEmail = `${username}@englishschool.ac.cy`;
+				/*-----INIT-----*/
 
-				if (!username || !password || !isValidUsername) {
-					return null;
+				/*-----ADMIN-----*/
+				adminQuery = await prisma.admin.findFirst({
+					where: {
+						OR: [{ email: username }, { email: studentEmail }],
+					},
+				});
+				if (adminQuery) {
+					const isValid = await verifyPassword(password as string, adminQuery.password);
+					if (isValid) {
+						adminUserObject = { fullName: adminQuery.fullName, email: adminQuery.email };
+						adminObject = { id: adminQuery.id };
+					}
 				}
+				const currentElectionId = await prisma.election.findFirst({
+					where: { is_current: true },
+					select: { id: true },
+				});
 
-				const email = `${username}@englishschool.ac.cy`;
-				//////////////////////////LOGIN TO THE WEDUC PORTAL//////////////////////////
 				let weducLoginData: Dispatcher.ResponseData, weducUserProfileLocation: Dispatcher.ResponseData, weducUserData: Dispatcher.ResponseData;
+				const headers = { Host: "app.weduc.co.uk", "Sec-Ch-Ua-Mobile": "?0" };
+				if (isSchoolId) {
+					try {
+						weducLoginData = await request("https://app.weduc.co.uk/main/index/ajaxlogin", {
+							method: "POST",
+							body: `username=${studentEmail}&password=${password}`,
+							headers: {
+								...headers,
+								"Content-Type": "application/x-www-form-urlencoded",
+							},
+						});
+						weducUserProfileLocation = await request("https://app.weduc.co.uk/user/profile/view/", {
+							method: "GET",
+							headers: {
+								...headers,
+								Cookie: weducLoginData.headers["set-cookie"].split(";")[0],
+							},
+						});
+						weducUserData = await request(weducUserProfileLocation.headers.location.toString(), {
+							method: "GET",
+							headers: {
+								...headers,
+								Cookie: (weducLoginData.headers["set-cookie"] as string).split(";")[0],
+							},
+						});
+					} catch (error) {
+						return null;
+					}
 
-				try {
-					weducLoginData = await request("https://app.weduc.co.uk/main/index/ajaxlogin", {
-						method: "POST",
-						body: `username=${email}&password=${password}`,
-						headers: {
-							Host: "app.weduc.co.uk",
-							"Content-Type": "application/x-www-form-urlencoded",
-							"Sec-Ch-Ua-Mobile": "?0",
-						},
-					});
-				} catch (error) {
-					return null;
+					const weducUserDataText = await weducUserData.body.text();
+
+					const formMatch = weducUserDataText.match(/"alias":"(.+?)"/);
+					const yearGroup = formMatch?.[1]?.split("")?.[0];
+					const isStudent = yearGroup && ["3", "4", "5", "6", "7"].includes(yearGroup);
+
+					if (isStudent) {
+						const nameMatch = weducUserDataText.match(/"name":"(.+?)","alias"/);
+						const profilePictureMatch = weducUserDataText.match(/<img class="rounded profile-img" src="(.+?)">/);
+
+						const fullName = nameMatch?.[1];
+						const formGroup = formMatch[1]?.replace(" ", "").slice(0, 2);
+						const profilePictureUrl = profilePictureMatch?.[1];
+						const studentId = username;
+						const email = studentEmail;
+
+						studentUserObject = { fullName, email, profilePictureUrl };
+						studentObject = { id: studentId, yearGroup, formGroup };
+
+						try {
+							candidateQuery = await prisma.candidate.findUnique({
+								where: {
+									election_id_student_id: {
+										election_id: currentElectionId?.id,
+										student_id: username as string,
+									},
+								},
+							});
+							if (!adminObject || !adminUserObject) {
+								adminQuery = await prisma.admin.findFirst({
+									where: { OR: [{ email: username }, { email: studentEmail }] },
+								});
+								if (adminQuery) {
+									adminObject = { id: adminQuery.id };
+									adminUserObject = { fullName: adminQuery.fullName, email: adminQuery.email };
+								}
+							}
+						} catch (error) {
+							return null;
+						}
+
+						if (candidateQuery) {
+							candidateUserObject = { fullName: candidateQuery.officialName + " " + candidateQuery.officialSurname, email: candidateQuery.schoolEmail, password: candidateQuery.password, id: candidateQuery.id };
+							candidateObject = { id: candidateQuery.id };
+						}
+					}
 				}
-				//GET WEDUC UUID AND NAVIGATE TO PROFILE URL
-				try {
-					weducUserProfileLocation = await request("https://app.weduc.co.uk/user/profile/view/", {
-						method: "GET",
-						headers: {
-							Host: "app.weduc.co.uk",
-							Cookie: weducLoginData.headers["set-cookie"].split(";")[0],
-							"Sec-Ch-Ua-Mobile": "?0",
-						},
-					});
-				} catch (error) {
-					return null;
-				}
-				//GET PROFILE PICTURE AND FORM CLASS
-				try {
-					weducUserData = await request(weducUserProfileLocation.headers.location.toString(), {
-						method: "GET",
-						headers: {
-							Host: "app.weduc.co.uk",
-							Cookie: (weducLoginData.headers["set-cookie"] as string).split(";")[0],
-							"Sec-Ch-Ua-Mobile": "?0",
-						},
-					});
-				} catch (error) {
-					return null;
-				}
-				const weducUserDataText = await weducUserData.body.text();
-				const formMatch = weducUserDataText.match(/"alias":"(.+?)"/);
-				const nameMatch = weducUserDataText.match(/"name":"(.+?)","alias"/);
-				const profilePictureMatch = weducUserDataText.match(/<img class="rounded profile-img" src="(.+?)">/);
-				const fullName = nameMatch?.[1];
-				const yearGroup = formMatch[1]?.split("")[0];
-				const profilePictureUrl = profilePictureMatch?.[1];
-				const studentId = username;
-				//only years 3,4,5,6,7 are allowed to vote
-				if (!yearGroup || !["3", "4", "5", "6", "7"].includes(yearGroup)) {
-					return null;
-				}
-				const userObject = { fullName, email, profilePictureUrl, student: { studentId, yearGroup } };
-				return userObject;
+
+				if (!studentUserObject && !adminUserObject && !candidateUserObject) return null;
+				if (studentUserObject && !studentObject) return null;
+				if (adminUserObject && !adminObject) return null;
+				if (candidateUserObject && !candidateObject) return null;
+				if (!studentUserObject && studentObject) return null;
+				if (!adminUserObject && adminObject) return null;
+				if (!candidateUserObject && candidateObject) return null;
+
+				let userObject = studentUserObject || adminUserObject || candidateUserObject;
+
+				let userAttributes = {};
+				if (studentObject) userAttributes = { student: studentObject, ...userAttributes };
+				console.log(adminObject, adminUserObject);
+				if (adminObject) userAttributes = { admin: adminObject, ...userAttributes };
+				if (candidateObject) userAttributes = { candidate: candidateObject, ...userAttributes };
+
+				const user = { ...userObject, ...userAttributes };
+				if (!user || isEmptyObject(user)) return null;
+				return user;
 			},
 		}),
 	],
@@ -151,10 +197,3 @@ export const {
 	signIn,
 	signOut,
 } = NextAuth(authConfig);
-
-//<input type="text" id="profile_firstname" name="profile[firstname]" required="required" readonly="readonly" class="form-control" value="Berzan" />
-//<input type="text" id="profile_lastname" name="profile[lastname]" required="required" readonly="readonly" class="form-control" value="Ozejder" />
-//<input type="text" id="profile_email" name="profile[email]" class="form-control" value="s171040@englishschool.ac.cy" />
-//<input type="text" id="profile_username" name="profile[username]" readonly="readonly" class="form-control" value="s171040" />
-//get profile picture url                        <img class="rounded profile-img" src="https://app.weduc.co.uk/get/external/f/id/6bc6fd98741214b3dc702ccb13b31b2cd5fe3ddaccb71cbc4c6f67e6f093d926.jpg">
-//"alias":"7 Yellow" get the class

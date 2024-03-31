@@ -15,30 +15,28 @@ model Faq {
 }
 
 model Election {
-   id                 String      @id @unique @default(uuid())
-   election_date      String?
-   election_year      String      @unique
-   is_current         Boolean     @default(false)
-   forceEnabled       Boolean     @default(false)
-   autoEnabled        Boolean     @default(false)
-   blocked            Boolean     @default(false)
-   total_voters       Int?
-   description        String?
-   voting_start_time  String?
-   voting_end_time    String?
-   publish_results    Boolean     @default(false)
-   is_visible         Boolean     @default(false)
+   id                String      @id @unique @default(uuid())
+   election_date     String?
+   election_year     String      @unique
+   is_current        Boolean     @default(false)
+   forceEnabled      Boolean     @default(false)
+   autoEnabled       Boolean     @default(false)
+   blocked           Boolean     @default(false)
+   total_voters      Int?
+   description       String?
+   voting_start_time String?
+   voting_end_time   String?
+   publish_results   Boolean     @default(false)
+   is_visible        Boolean     @default(false)
    //
-   edit_bio           Boolean     @default(true)
-   edit_slogan        Boolean     @default(true)
-   edit_socials       Boolean     @default(true) //includes social media and video; speech is added by admin
-   edit_photo         Boolean     @default(true)
-   edit_questions     Boolean     @default(true)
+   edit_bio          Boolean     @default(true)
+   edit_slogan       Boolean     @default(true)
+   edit_socials      Boolean     @default(true) //includes social media and video; speech is added by admin
+   edit_photo        Boolean     @default(true)
+   edit_questions    Boolean     @default(true)
    //
-   candidates_visible Boolean     @default(false)
-   //
-   Candidate          Candidate[]
-   Question           Question[]
+   Candidate         Candidate[]
+   Question          Question[]
 }
 
 model Question {

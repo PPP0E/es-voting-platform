@@ -9,8 +9,64 @@ import TeamMemberCard from "./team-member-card";
 import Icon from "@/components/ui/Icon";
 import Confetti from "@/components/ui/confetti";
 import { redirect } from "next/navigation";
+import prisma from "@/prisma/client";
+import { Avatar, AvatarGroup } from "@nextui-org/avatar";
 
-export default function Component({ election, hideDescription = false, hideButtons = false }) {
+export default async function Component({ election, hideDescription = false, hideButtons = false }) {
+	let girlWinners = [],
+		boyWinners = [];
+	if (election.publish_results) {
+		hideButtons = true;
+		girlWinners = prisma.candidate.findMany({
+			where: {
+				type: "GIRL",
+				election: {
+					id: election.id,
+				},
+			},
+			orderBy: {
+				Vote: {
+					_count: "desc",
+				},
+			},
+			take: 2,
+		});
+		boyWinners = prisma.candidate.findMany({
+			where: {
+				type: "BOY",
+				election: {
+					id: election.id,
+				},
+			},
+			orderBy: {
+				Vote: {
+					_count: "desc",
+				},
+			},
+			take: 2,
+		});
+		[girlWinners, boyWinners] = await Promise.all([girlWinners, boyWinners]);
+	}
+
+	function WinnerCard({ candidate, text }) {
+		return (
+			<div
+				style={{
+					backgroundImage: `url(/api/users/${candidate.id}/avatar)`,
+				}}
+				className={`bg-content1/60 bg-cover border rounded-3xl md:hover:rotate-2 md:hover:translate-x-2 duration-300 overflow-hidden aspect-square`}>
+				<div className="flex w-auto h-full bg-gradient-to-b from-transparent to-black via-black/60">
+					<div className="mt-auto p-6">
+						<h3 className="mt-auto font-medium text-sm md:text-lg">
+							{candidate?.officialName} {candidate?.officialSurname}
+						</h3>
+						<span className="md:text-small text-xs text-default-500 ">{text}</span>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			{election.publish_results && <Confetti />}
@@ -42,11 +98,19 @@ export default function Component({ election, hideDescription = false, hideButto
 						</div>
 					)}
 				</div>
-				{!!election.Candidate.length && (
+				{!!election.Candidate.length && !election.publish_results && (
 					<div className="mt-12 grid w-full grid-cols-1 gap-4 auto-rows-fr md:grid-cols-2 lg:grid-cols-3">
 						{election.Candidate.map((member, index) => (
 							<TeamMemberCard electionYear={election.election_year} index={index} key={index} {...member} />
 						))}
+					</div>
+				)}
+				{!!election.Candidate.length && election.publish_results && (
+					<div className="my-6 grid-cols-2 grid gap-4">
+						<WinnerCard candidate={girlWinners[0]} text="Head Girl" />
+						<WinnerCard candidate={boyWinners[0]} text="Head Boy" />
+						<WinnerCard candidate={girlWinners[1]} text="Deputy Head Girl" />
+						<WinnerCard candidate={boyWinners[1]} text="Deputy Head Boy" />
 					</div>
 				)}
 				{!election.Candidate.length && (
@@ -63,7 +127,7 @@ export default function Component({ election, hideDescription = false, hideButto
 					</Button>
 				)}
 			</section>
-			{!!election.Candidate.length && election.is_current && (
+			{!!election.Candidate.length && election.is_current && !election.publish_results && (
 				<div className="mb-20 pwa:hidden flex">
 					<div className="text-tiny md:hover:bg-white md:hover:text-black duration-300 cursor-pointer bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
 						<Icon icon="material-symbols:info" width={24} />

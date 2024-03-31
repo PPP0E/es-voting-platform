@@ -76,36 +76,6 @@ export default function Component({ candidate }) {
 		router.refresh();
 	}
 
-	/* 
-	model Candidate {
-		id              String          @id @unique @default(uuid())
-		officialName    String
-		officialSurname String
-		slug            String?
-		type            CandidateType
-		//
-		student_id      String?
-		//
-		bio             String?
-		slogan          String?
-		//
-		instagram       String?
-		facebook        String?
-		twitter         String?
-		bereal          String?
-		snapchat        String?
-		website         String?
-		youtube         String?
-		//
-		video_url       String?
-		//
-		photo           String?
-		file            String?
-	
-		@@unique([election_id, student_id])
-		@@unique([election_id, slug])
-	} */
-
 	useEffect(() => {
 		if (!candidate) return;
 		setFirstName(candidate.officialName);

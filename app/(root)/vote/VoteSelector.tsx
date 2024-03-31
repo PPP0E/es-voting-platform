@@ -31,8 +31,8 @@ export default function VoteSelector({ currentElection, initialPage = 1, votes }
 	async function voteHandler(formData: FormData) {
 		const res = await vote(formData);
 		if (res) {
-			if (res.ok) toast.success(res.message);
-			if (!res.ok) toast.error(res.message);
+			if (res?.ok) toast.success(res.message);
+			if (!res?.ok) toast.error(res.message);
 			return;
 		}
 	}
@@ -122,7 +122,7 @@ export default function VoteSelector({ currentElection, initialPage = 1, votes }
 			<Layout bigTitle="You've Voted" smallTitle={`${currentElection.election_year} Student Elections`}>
 				<ReactConfetti numberOfPieces={30} width={width} height={height} />
 				<div className="border shadow-lg shadow-content1 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] relative z-[10000] animate-shimmer bg-[length:200%_100%] p-4 rounded-2xl bg-content1/60 flex flex-col gap-1 text-center max-w-[450px]">
-					<p className="uppercase">{session.user.student.studentId == "s1710401" && "The Cutest Person in the world has voted!!!!!"}</p>
+					<p className="uppercase">{session.user.student.id == "s1710401" && "The Cutest Person in the world has voted!!!!!"}</p>
 					{/* s181143 */}
 					<p className="text-sm">If someone else has voted on your behalf contact us.</p>
 					<Image alt="Tick" src={Confirm} unoptimized className="select-none my-[-64px]" />

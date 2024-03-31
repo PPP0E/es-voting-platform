@@ -21,7 +21,7 @@ export default async function Component({ params }) {
 
 	const votes = await prisma.vote.findMany({
 		where: {
-			student_id: session.user.student.studentId,
+			student_id: session.user.student.id,
 			Candidate: {
 				election: {
 					id: currentElection.id,

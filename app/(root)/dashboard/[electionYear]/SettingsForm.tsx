@@ -4,7 +4,7 @@ import SwitchCell, { SwitchCellBottom, SwitchCellMiddle, SwitchCellTop } from "@
 import type { CardProps } from "@nextui-org/react";
 import { Button, Card, CardBody, CardHeader, Chip, Input, Link, Spacer } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { allowEditBio, allowEditPhoto, allowEditQuestions, allowEditSlogan, allowEditSocials, automaticChange, currentChange, deleteAllVotes, deleteElection, forceChange, updateElectionDate, updateEndTime, updateStartTime, visibility } from "./actions";
+import { allowEditBio, allowEditPhoto, allowEditQuestions, allowEditSlogan, allowEditSocials, automaticChange, currentChange, deleteAllVotes, deleteElection, forceChange, publishResults, updateElectionDate, updateEndTime, updateStartTime, visibility } from "./actions";
 import { useRouter } from "next/navigation";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
 import { Select, SelectSection, SelectItem } from "@nextui-org/select";
@@ -32,10 +32,6 @@ let months = [
 
 export default function Component({ selectedElection }: { selectedElection: Election }) {
 	const [isLoading, setIsLoading] = useState(false);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [isDeleteElectionModalOpen, setIsDeleteElectionModalOpen] = useState(false);
-	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 	const [electionDate, setElectionDate] = useState(selectedElection.election_date || "");
 	const [debouncedElectionDate] = useDebouncedValue(electionDate, 1000);
 	const [electionStartTime, setElectionStartTime] = useState(selectedElection.voting_start_time || "");
@@ -43,6 +39,12 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	const [debouncedElectionStartTime] = useDebouncedValue(electionStartTime, 1500);
 	const [debouncedElectionEndTime] = useDebouncedValue(electionEndTime, 1500);
 	const [password, setPassword] = useState("");
+
+	const [isSetCurrentModalOpen, setIsSetCurrentModalOpen] = useState(false);
+	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+	const [isUnpublishModalOpen, setIsUnpublishModalOpen] = useState(false);
+	const [isDeleteAllVotesModalOpen, setIsDeleteAllVotesModalOpen] = useState(false);
+	const [isDeleteElectionModalOpen, setIsDeleteElectionModalOpen] = useState(false);
 
 	const router = useRouter();
 
@@ -129,19 +131,29 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 		await currentChange(selectedElection.id, true);
 		router.refresh();
 		setIsLoading(false);
-		setIsModalOpen(false);
+		setIsSetCurrentModalOpen(false);
 	}
 
 	async function handleAutomaticChange(e: Boolean) {
 		setIsLoading(true);
-		await automaticChange(selectedElection.id, e);
+		const res = await automaticChange(selectedElection.id, e);
+		if (res?.ok) {
+			toast.success(res?.message);
+		} else {
+			toast.error(res?.message);
+		}
 		router.refresh();
 		setIsLoading(false);
 	}
 
 	async function handleForceChange(e: Boolean) {
 		setIsLoading(true);
-		await forceChange(selectedElection.id, e);
+		const res = await forceChange(selectedElection.id, e);
+		if (res?.ok) {
+			toast.success(res?.message);
+		} else {
+			toast.error(res?.message);
+		}
 		router.refresh();
 		setIsLoading(false);
 	}
@@ -156,10 +168,10 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	async function setElectionDateHandler() {
 		setIsLoading(true);
 		const res = await updateElectionDate(selectedElection.id, debouncedElectionDate);
-		if (res.ok) {
-			toast.success("Election date updated");
+		if (res?.ok) {
+			toast.success(res?.message);
 		} else {
-			toast.error("An error occurred while updating date.");
+			toast.error(res?.message);
 		}
 		router.refresh();
 		setIsLoading(false);
@@ -168,10 +180,10 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	async function updateStartTimeHandler() {
 		setIsLoading(true);
 		const res = await updateStartTime(selectedElection.id, electionStartTime);
-		if (res.ok) {
-			toast.success("Start time updated");
+		if (res?.ok) {
+			toast.success(res?.message);
 		} else {
-			toast.error("An error occurred while updating start time.");
+			toast.error(res?.message);
 		}
 		router.refresh();
 		setIsLoading(false);
@@ -180,10 +192,10 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	async function updateEndTimeHandler() {
 		setIsLoading(true);
 		const res = await updateEndTime(selectedElection.id, electionEndTime);
-		if (res.ok) {
-			toast.success("End time updated");
+		if (res?.ok) {
+			toast.success(res?.message);
 		} else {
-			toast.error("An error occurred while updating end time.");
+			toast.error(res?.message);
 		}
 		router.refresh();
 		setIsLoading(false);
@@ -192,11 +204,11 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	async function deleteAllVotesHandler() {
 		setIsLoading(true);
 		const res = await deleteAllVotes(selectedElection.id, password);
-		if (res.ok) {
-			toast.success("All votes deleted");
-			setIsDeleteModalOpen(false);
+		if (res?.ok) {
+			toast.success(res?.message);
+			setIsDeleteAllVotesModalOpen(false);
 		} else {
-			toast.error(res.message || "An error occurred while deleting votes.");
+			toast.error(res?.message);
 		}
 		router.refresh();
 		setIsLoading(false);
@@ -206,11 +218,39 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	async function deleteElectionHandler() {
 		setIsLoading(true);
 		const res = await deleteElection(selectedElection.id, password);
-		if (res.ok) {
+		if (res?.ok) {
 			toast.success("Election deleted");
 			setIsDeleteElectionModalOpen(false);
 		} else {
-			toast.error(res.message || "An error occurred while deleting election.");
+			toast.error(res?.message);
+		}
+		router.refresh();
+		setIsLoading(false);
+		setPassword("");
+	}
+
+	async function handlePublishResults() {
+		setIsLoading(true);
+		const res = await publishResults(selectedElection.id, password);
+		if (res?.ok) {
+			toast.success("Results published");
+			setIsPublishModalOpen(false);
+		} else {
+			toast.error(res?.message);
+		}
+		router.refresh();
+		setIsLoading(false);
+		setPassword("");
+	}
+
+	async function handleUnpublishResults() {
+		setIsLoading(true);
+		const res = await publishResults(selectedElection.id, password);
+		if (res?.ok) {
+			toast.success("Results unpublished");
+			setIsPublishModalOpen(false);
+		} else {
+			toast.error(res?.message);
 		}
 		router.refresh();
 		setIsLoading(false);
@@ -268,6 +308,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 
 	useEffect(() => {
 		if (debouncedElectionDate !== selectedElection.election_date) {
+			console.log(debouncedElectionDate);
 			setElectionDateHandler();
 		}
 	}, [debouncedElectionDate]);
@@ -284,53 +325,101 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 		}
 	}, [debouncedElectionEndTime]);
 
-	function PublishResultsModal() {
-		return (
-			<Modal disableAnimation key="PublishResultsModal" onClose={() => setIsPublishModalOpen(false)} isOpen={isPublishModalOpen}>
-				<ModalContent>
-					<ModalHeader className="flex flex-col gap-1">Publish Results</ModalHeader>
-					<ModalBody>
-						<p>Are you sure you want to publish the results of the {selectedElection.election_year} elections?</p>
-						<Input autoFocus key="PublishResultsModalInput" value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
-					</ModalBody>
-					<ModalFooter>
-						<Button onPress={() => setIsPublishModalOpen(false)} color="danger" variant="light">
-							Close
-						</Button>
-						<Button isDisabled={selectedElection.publish_results} onPress={handleCurrentChange} color="primary">
-							Publish
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
-		);
-	}
+	useEffect(() => {
+		console.log(electionDate);
+	}, [electionDate]);
 
 	return (
 		<>
 			<Modal
 				onClose={() => {
-					setIsDeleteModalOpen(false);
+					setIsSetCurrentModalOpen(false);
 					setPassword("");
 				}}
-				isOpen={isDeleteModalOpen}>
+				isOpen={isSetCurrentModalOpen}>
+				<ModalContent>
+					<ModalHeader className="flex flex-col gap-1">Change Current Election</ModalHeader>
+					<ModalBody as="form" id="CurrentElectionModal">
+						<p>Are you sure you want to set the {selectedElection.election_year} election as current?</p>
+						<Input isClearable value={password} autoFocus onValueChange={setPassword} size="lg" label="Password" type="password" />
+					</ModalBody>
+					<ModalFooter>
+						<Button onPress={() => setIsSetCurrentModalOpen(false)} color="danger" variant="light">
+							Close
+						</Button>
+						<Button isDisabled={selectedElection.is_current} onPress={handleCurrentChange} type="submit" form="CurrentElectionModal" color="primary">
+							Confirm
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			<Modal
+				onClose={() => {
+					setIsPublishModalOpen(false);
+					setPassword("");
+				}}
+				isOpen={isPublishModalOpen}>
+				<ModalContent>
+					<ModalHeader className="flex flex-col gap-1">Publish Results</ModalHeader>
+					<ModalBody id="PublishResultsModal" as="form">
+						<p>Are you sure you want to publish the results of the {selectedElection.election_year} elections?</p>
+						<Input isClearable autoFocus key="PublishResultsModalInput" value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
+					</ModalBody>
+					<ModalFooter>
+						<Button onPress={() => setIsPublishModalOpen(false)} color="danger" variant="light">
+							Close
+						</Button>
+						<Button isDisabled={selectedElection.publish_results} type="submit" form="PublishResultsModal" onPress={handlePublishResults} color="primary">
+							Publish
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			<Modal
+				onClose={() => {
+					setIsUnpublishModalOpen(false);
+					setPassword("");
+				}}
+				isOpen={isUnpublishModalOpen}>
+				<ModalContent>
+					<ModalHeader className="flex flex-col gap-1">Unpublish Results</ModalHeader>
+					<ModalBody id="DeleteVotesModal" as="form">
+						<p>Are you sure you want to remove the published results of the {selectedElection.election_year} elections?</p>
+						<Input isClearable autoFocus value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
+					</ModalBody>
+					<ModalFooter>
+						<Button onPress={() => setIsUnpublishModalOpen(false)} color="danger" variant="light">
+							Close
+						</Button>
+						<Button isDisabled={selectedElection.publish_results} onPress={handleUnpublishResults} type="submit" form="DeleteVotesModal" color="primary">
+							Remove
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			<Modal
+				onClose={() => {
+					setIsDeleteAllVotesModalOpen(false);
+					setPassword("");
+				}}
+				isOpen={isDeleteAllVotesModalOpen}>
 				<ModalContent>
 					<ModalHeader className="flex flex-col gap-1">Delete All Votes</ModalHeader>
-					<ModalBody id="deleteVotes" as="form" action={deleteAllVotesHandler}>
+					<ModalBody id="DeleteVotesModal" as="form" action={deleteAllVotesHandler}>
 						<p>Are you sure you want to delete all the votes of the {selectedElection.election_year} elections?</p>
-						<Input value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
+						<Input isClearable value={password} autoFocus onValueChange={setPassword} size="lg" label="Password" type="password" />
 					</ModalBody>
 					<ModalFooter>
 						<Button
 							onPress={() => {
-								setIsDeleteModalOpen(false);
+								setIsDeleteAllVotesModalOpen(false);
 								setPassword("");
 							}}
 							color="danger"
 							variant="light">
 							Close
 						</Button>
-						<Button isDisabled={isElectionRunning || !password || password.length < 8} type="submit" isLoading={isLoading} form="deleteVotes" color="primary">
+						<Button isDisabled={isElectionRunning || !password || password.length < 8} type="submit" isLoading={isLoading} form="DeleteVotesModal" color="primary">
 							Confirm
 						</Button>
 					</ModalFooter>
@@ -341,12 +430,12 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					setIsDeleteElectionModalOpen(false);
 					setPassword("");
 				}}
-				isOpen={isDeleteModalOpen}>
+				isOpen={isDeleteElectionModalOpen}>
 				<ModalContent>
 					<ModalHeader className="flex flex-col gap-1">Delete the Election</ModalHeader>
-					<ModalBody as="form" id="deleteElection" action={deleteAllVotesHandler}>
+					<ModalBody as="form" id="DeleteElectionModal" action={deleteElectionHandler}>
 						<p>Are you sure you want to delete the {selectedElection.election_year} election?</p>
-						<Input value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
+						<Input isClearable value={password} autoFocus onValueChange={setPassword} size="lg" label="Password" type="password" />
 					</ModalBody>
 					<ModalFooter>
 						<Button
@@ -358,30 +447,12 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 							variant="light">
 							Close
 						</Button>
-						<Button isDisabled={isElectionRunning || !password || password.length < 8} type="submit" isLoading={isLoading} form="deleteElection" color="primary">
+						<Button isDisabled={isElectionRunning || !password || password.length < 8} type="submit" isLoading={isLoading} form="DeleteElectionModal" color="primary">
 							Confirm
 						</Button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
-			<Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
-				<ModalContent>
-					<ModalHeader className="flex flex-col gap-1">Change Current Election</ModalHeader>
-					<ModalBody>
-						<p>Are you sure you want to set the {selectedElection.election_year} election as current?</p>
-						<Input value={password} onValueChange={setPassword} size="lg" label="Password" type="password" />
-					</ModalBody>
-					<ModalFooter>
-						<Button onPress={() => setIsModalOpen(false)} color="danger" variant="light">
-							Close
-						</Button>
-						<Button isDisabled={selectedElection.is_current} onPress={handleCurrentChange} color="primary">
-							Confirm
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
-			<PublishResultsModal />
 			<div className="w-full bg-transparent">
 				<form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
 					<div className="w-full flex-col gap-2  bg-content1/60 p-4 flex md:flex-col rounded-xl border">
@@ -397,18 +468,22 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					<div>
 						<SectionTitle>Main Settings</SectionTitle>
 						<div className="gap-4 auto-rows-fr grid md:grid-cols-2">
-							<ButtonCard title="Election Date">
-								<Input isRequired value={electionDate} onChange={(e) => setElectionDate(e.target.value)} placeholder=" " label="Day and Month" isDisabled={isLoading} className="md:max-w-[300px] my-auto ml-auto" type="date" min={`${selectedElection.election_year}-01-01`} max={`${selectedElection.election_year}-12-31`} />
-							</ButtonCard>
+							<div className={cn("w-full bg-content1/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border")}>
+								<div className="flex flex-col my-auto">
+									<p className="text-medium">Election Date</p>
+									<p className="text-small text-default-500"></p>
+								</div>
+								<Input isRequired value={electionDate} onChange={(e) => setElectionDate(e.target.value)} placeholder=" " label="Day and Month" isDisabled={isLoading || isElectionRunning} className="md:max-w-[300px] my-auto ml-auto" type="date" min={`${selectedElection.election_year}-01-01`} max={`${selectedElection.election_year}-12-31`} />
+							</div>
 							<ButtonCard title="Current Election" description="Set the election as current">
-								<Button onPress={() => setIsModalOpen(true)} isDisabled={isLoading || selectedElection.is_current} className="ml-auto my-auto md:w-auto w-full rounded-full" color="danger">
+								<Button onPress={() => setIsSetCurrentModalOpen(true)} isDisabled={isLoading || selectedElection.is_current} className="ml-auto my-auto md:w-auto w-full rounded-full" color="danger">
 									{selectedElection.is_current ? "Current Election" : "Set as Current"}
 								</Button>
 							</ButtonCard>
 							<SwitchCell isDisabled={isLoading || selectedElection.is_current} onValueChange={handleVisibilityChange} defaultSelected={selectedElection.is_visible} label="Visible" description="Show the election on the public website" />
-							<SwitchCell isDisabled={isLoading || !selectedElection.is_current} onValueChange={handleForceChange} defaultSelected={selectedElection.forceEnabled} label="Force Voting On" />
+							<SwitchCell isDisabled={isLoading || !selectedElection.is_current || selectedElection.publish_results} onValueChange={handleForceChange} defaultSelected={selectedElection.forceEnabled} label="Force Voting On" />
 							<ButtonCard title="Publish Results" description="Stop the election and publish the results publicly on the website. How many votes each candidates got won't be shown.">
-								<Button onPress={() => setIsPublishModalOpen(true)} isDisabled={isLoading || selectedElection.publish_results} className="ml-auto my-auto md:w-auto w-full min-w-max rounded-full" color="success">
+								<Button onPress={() => setIsPublishModalOpen(true)} isDisabled={isLoading || selectedElection.publish_results || !selectedElection.blocked} className="ml-auto my-auto md:w-auto w-full min-w-max rounded-full" color="success">
 									{selectedElection.publish_results ? "Results Published" : "Publish Results"}
 								</Button>
 							</ButtonCard>
@@ -416,7 +491,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					</div>
 					<div className="flex flex-col">
 						<SectionTitle>Scheduled Election Settings</SectionTitle>
-						<SwitchCellTop isDisabled={isLoading} onValueChange={handleAutomaticChange} defaultSelected={selectedElection.autoEnabled} description="Automatically start and end the voting based on the specified times." label="Automatic Scheduled Voting" />
+						<SwitchCellTop isDisabled={isLoading || (!selectedElection.is_current && !selectedElection.autoEnabled) || selectedElection.publish_results} onValueChange={handleAutomaticChange} defaultSelected={selectedElection.autoEnabled} description="Automatically start and end the voting based on the specified times." label="Automatic Scheduled Voting" />
 						<ButtonCard title="Automatic Election Schedule" description="The day the election will be held on" className="rounded-t-none border-t-0">
 							<div className="md:ml-auto my-auto flex">
 								<Select label="Start Hour" selectedKeys={[electionStartTime.split(":")[0]]} onChange={(e) => handleStartTimeChange(e.target.value, "hour")} classNames={{ trigger: "rounded-r-none" }} className="md:w-[150px]">
@@ -454,13 +529,18 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					</div>
 					<div>
 						<SectionTitle>Danger Zone</SectionTitle>
-						<ButtonCard title="Delete All Votes" description="Deletes all votes from the election" className="rounded-b-none bg-red-800/60 border-neutral-500">
-							<Button color="primary" isDisabled={isElectionRunning} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto ">
-								{isElectionRunning ? "Election Currently Running" : "Delete"}
+						<ButtonCard title="Unpublish Results" description="Unpublish results from the public website" className="rounded-b-none bg-yellow-500/60 border-neutral-500">
+							<Button color="primary" isDisabled={isElectionRunning || !selectedElection.publish_results} onPress={() => setIsUnpublishModalOpen(true)} className="ml-auto my-auto ">
+								{isElectionRunning ? "Election Currently Running" : "Unpublish"}
+							</Button>
+						</ButtonCard>
+						<ButtonCard title="Delete All Votes" description="Deletes all votes from the election" className="rounded-none border-t-0 bg-red-800/60 border-neutral-500">
+							<Button color="primary" isDisabled={isElectionRunning || !selectedElection.blocked} onPress={() => setIsDeleteAllVotesModalOpen(true)} className="ml-auto my-auto ">
+								{!selectedElection.blocked ? "No Votes" : "Delete"}
 							</Button>
 						</ButtonCard>
 						<ButtonCard title="Delete Election" description="Deletes the whole election, requires all candidates to be deleted." className="rounded-t-none border-t-0 bg-red-800/60 border-neutral-500">
-							<Button color="primary" isDisabled={isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled} onPress={() => setIsDeleteModalOpen(true)} className="ml-auto my-auto">
+							<Button color="primary" isDisabled={isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled} onPress={() => setIsDeleteElectionModalOpen(true)} className="ml-auto my-auto">
 								{isElectionRunning || !!numberOfCandidates || selectedElection.autoEnabled ? "Election Currently Can't Be Deleted" : "Delete"}
 							</Button>
 						</ButtonCard>

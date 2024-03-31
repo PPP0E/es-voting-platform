@@ -39,8 +39,29 @@ export default auth((req) => {
 	if (nextUrl.pathname === "/login" && isAuthenticated) {
 		return NextResponse.redirect(new URL("/", nextUrl.origin));
 	}
-	if (nextUrl.pathname.includes("/dashboard") && (!isAuthenticated || !req.auth.user.admin)) {
-		return NextResponse.redirect(new URL("/login", nextUrl.origin));
+
+	if (nextUrl.pathname.includes("/dashboard") && !isAuthenticated) {
+		return NextResponse.redirect(new URL(`/login?return=${nextUrl.pathname}`, nextUrl.origin));
+	}
+
+	if (nextUrl.pathname.includes("/dashboard") && isAuthenticated && !req.auth.user.admin) {
+		return NextResponse.redirect(new URL("/", nextUrl.origin));
+	}
+
+	if (nextUrl.pathname.includes("/vote") && !isAuthenticated) {
+		return NextResponse.redirect(new URL(`/login?return=${nextUrl.pathname}`, nextUrl.origin));
+	}
+
+	if (nextUrl.pathname.includes("/vote") && isAuthenticated && !req.auth.user.student) {
+		return NextResponse.redirect(new URL("/", nextUrl.origin));
+	}
+
+	if (nextUrl.pathname.includes("/profile") && !isAuthenticated) {
+		return NextResponse.redirect(new URL(`/login?return=${nextUrl.pathname}`, nextUrl.origin));
+	}
+
+	if (nextUrl.pathname.includes("/vote") && isAuthenticated && !req.auth.user.candidate) {
+		return NextResponse.redirect(new URL("/", nextUrl.origin));
 	}
 });
 

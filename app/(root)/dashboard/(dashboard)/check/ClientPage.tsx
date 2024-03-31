@@ -19,11 +19,11 @@ export default function ClientComponent({ votes = [] }) {
 	async function deleteBallotHandler(id) {
 		setIsLoading(true);
 		const res = await deleteBallot(id);
-		if (res.ok) {
+		if (res?.ok) {
 			toast.success(res.message);
 			router.refresh();
 		}
-		if (!res.ok) {
+		if (!res?.ok) {
 			toast.error(res.message);
 		}
 		setIsLoading(false);

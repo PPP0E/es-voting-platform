@@ -7,7 +7,7 @@ import Image from "next/image";
 import ESLogo from "@/public/assets/branding/logos/es-logo.svg";
 import ESLogoWhite from "@/public/assets/branding/logos/es-logo-white.svg";
 import { studentLoginHandler } from "./login.server";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
 
@@ -19,6 +19,7 @@ export default function Component() {
 	const images = [{ src: "/assets/branding/english-school-6.jpg", logo: ESLogoWhite, backgroundPosition: "center" }];
 	const router = useRouter();
 	const randomImage = Math.floor(Math.random() * images.length);
+	const searchparams = useSearchParams();
 
 	async function loginHandler(formData: any) {
 		flushSync(() => {
@@ -38,7 +39,7 @@ export default function Component() {
 		if (isInStandaloneMode()) {
 			redirect("/dashboard");
 		}
-		redirect("/");
+		redirect(searchparams.get("return") || "/");
 	}
 
 	return (

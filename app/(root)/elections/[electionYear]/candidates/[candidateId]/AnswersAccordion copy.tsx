@@ -1,7 +1,7 @@
 "use client";
 
 import Icon from "@/components/ui/Icon";
-import { Accordion, AccordionItem, Button, Link, ScrollShadow, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button, Chip, Link, ScrollShadow, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/tabs";
 import { useState } from "react";
 import InstagramLogo from "@/public/assets/social-media/instagram.png";
@@ -24,7 +24,7 @@ export function ProfileTabs({ candidate }) {
 					}}
 					radius="lg"
 					variant="light">
-					<Tab key="about" title="About Me"></Tab>
+					{candidate.bio && <Tab key="about" title="About Me" />}
 					{candidate.video_url && <Tab key="video" title="Video" />}
 					{candidate.speech_url && <Tab key="speech" title="Speech" />}
 					{!!candidate.Answer.length && <Tab key="questions" title="Questions" />}
@@ -48,9 +48,12 @@ export function ProfileTabs({ candidate }) {
 				<Tab key="questions" title="About Me">
 					<div className="mx-auto max-w-[500px] flex flex-col gap-4">
 						{candidate.Answer.map((answer, index) => (
-							<div key={index} className="bg-content1/60 border rounded-xl p-4 gap-4 flex flex-col">
-								<p className="bg-gradient-to-br from-foreground-800 to-foreground-500 bg-clip-text text-md font-semibold tracking-tight text-transparent mb-[-10px] dark:to-foreground-200">{answer.question.title}</p>
-								<p className="text-default-600 mt-1 text-xs">{answer.content}</p>
+							<div key={index} className="bg-content1/60 border rounded-xl p-4 gap-1 flex flex-col">
+								<p className="bg-gradient-to-br flex from-foreground-800 to-foreground-500 bg-clip-text text-md font-semibold tracking-tight text-transparent dark:to-foreground-200">
+									<Chip className="rounded-lg mr-2">{index + 1}</Chip>
+									<span className="mt-[2.5px] block">{answer.question.title}</span>
+								</p>
+								<p className="text-default-600 mt-1 text-sm">{answer.content}</p>
 							</div>
 						))}
 					</div>

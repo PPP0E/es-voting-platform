@@ -39,6 +39,16 @@ export default async function Home() {
 		},
 	});
 
+	if (!currentElection) {
+		return (
+			<section className="flex max-w-5xl flex-col mx-auto items-center py-24 px-4">
+				<div className="flex max-w-xl flex-col text-center">
+					<h2 className="text-large text-default-500">No Elections Found</h2>
+				</div>
+			</section>
+		);
+	}
+
 	if (!!currentElection?.Candidate.length) {
 		const shuffledCandidates = currentElection.Candidate.sort(() => Math.random() - 0.5);
 		currentElection.Candidate = shuffledCandidates;
