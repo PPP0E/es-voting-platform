@@ -467,7 +467,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					</div>
 					<div>
 						<SectionTitle>Main Settings</SectionTitle>
-						<div className="gap-4 auto-rows-fr grid md:grid-cols-2">
+						<div className="gap-4 md:auto-rows-fr grid md:grid-cols-2">
 							<div className={cn("w-full bg-content1/60 flex-col gap-4 md:flex-row flex p-4 rounded-xl border")}>
 								<div className="flex flex-col my-auto">
 									<p className="text-medium">Election Date</p>

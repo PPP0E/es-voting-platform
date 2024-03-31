@@ -26,7 +26,8 @@ export default function Component({ faqsCount, currentElection }) {
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
-	}, []);
+		setIsMenuOpen(false);
+	}, [pathname]);
 
 	return (
 		<Navbar
@@ -37,6 +38,7 @@ export default function Component({ faqsCount, currentElection }) {
 			isBordered
 			maxWidth="full"
 			shouldHideOnScroll
+			isMenuOpen={isMenuOpen}
 			onMenuOpenChange={setIsMenuOpen}>
 			<NavbarContent className="">
 				<NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} className="sm:hidden" />
@@ -125,31 +127,53 @@ export default function Component({ faqsCount, currentElection }) {
 				)}
 			</NavbarContent>
 			<NavbarMenu>
-				<NavbarMenuItem>
-					<Link size="lg" href="/">
+				<NavbarMenuItem isActive={pathname == "/"}>
+					<Link href="/" size="lg">
 						Home
 					</Link>
 				</NavbarMenuItem>
-				<NavbarMenuItem>
-					<Link size="lg" href="/about">
-						About
-					</Link>
-				</NavbarMenuItem>
+				{faqsCount > 0 && (
+					<NavbarMenuItem isActive={pathname == "/about"}>
+						<Link href="/about" size="lg">
+							About
+						</Link>
+					</NavbarMenuItem>
+				)}
 				<NavbarMenuItem>
 					<Link size="lg" href="/elections">
 						Elections
 					</Link>
 				</NavbarMenuItem>
-				<NavbarMenuItem>
-					<Link size="lg" href="/dashboard">
-						Dashboard
-					</Link>
-				</NavbarMenuItem>
-				<NavbarMenuItem>
-					<Link size="lg" color="danger" className="cursor-pointer" onPress={signOut}>
-						Sign Out
-					</Link>
-				</NavbarMenuItem>
+				{status === "authenticated" && session.user?.candidate && (
+					<NavbarMenuItem>
+						<Link size="lg" href="/profile">
+							Profile
+						</Link>
+					</NavbarMenuItem>
+				)}
+				{status === "authenticated" && session.user?.admin && (
+					<NavbarMenuItem>
+						<Link size="lg" href="/dashboard">
+							Dashboard
+						</Link>
+					</NavbarMenuItem>
+				)}
+				{status === "authenticated" && (
+					<NavbarMenuItem>
+						<Link size="lg" color="danger" className="cursor-pointer" onPress={signOut}>
+							Sign Out
+						</Link>
+					</NavbarMenuItem>
+				)}
+				{status === "authenticated" && session.user?.student && isElectionRunning && (
+					<NavbarMenuItem>
+						<Link href="/vote" className="w-full">
+							<Button className="rounded-lg w-full text-md" size="lg" color="danger">
+								<span className="animate-pulse px-2">Vote</span>
+							</Button>
+						</Link>
+					</NavbarMenuItem>
+				)}
 			</NavbarMenu>
 		</Navbar>
 	);
