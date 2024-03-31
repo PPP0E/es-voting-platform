@@ -2,6 +2,8 @@ FROM node:20.12.0 as builder
 
 ARG DATABASE_URL
 ENV DATABASE_URL $DATABASE_URL
+ARG AUTH_SECRET
+ENV AUTH_SECRET $AUTH_SECRET
 
 # COPY --from=builder /app/next.config.js ./
 COPY package.json /tmp/package.json
