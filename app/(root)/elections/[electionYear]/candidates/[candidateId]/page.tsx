@@ -4,66 +4,67 @@ import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { redirect } from "next/navigation";
 import { Link } from "@nextui-org/link";
-import { SparklesCore } from "@/components/ui/sparkles";
 import Icon from "@/components/ui/Icon";
-import { Accordion, AccordionItem } from "@nextui-org/accordion";
-import { Divider } from "@nextui-org/divider";
 import AnswerAccordion from "./AnswersAccordion";
-import { title } from "process";
 import { Tooltip } from "@nextui-org/tooltip";
-import { Tabs, Tab } from "@nextui-org/tabs";
-import ProfileTabs from "./AnswersAccordion copy";
+import ProfileTabs from "./AnswersAccordion";
 import InstagramLogo from "@/public/assets/social-media/instagram.png";
 import Image from "next/image";
 import ViewCounter from "./ViewCounter";
 import { auth } from "@/auth";
+import BackButton from "./BackButton";
 
 export default async function Component({ params }) {
 	const session = await auth();
-	const candidate = await prisma.candidate.findFirst({
-		where: {
-			OR: [
-				{ id: params.candidateId },
-				{
-					election: {
-						election_year: params.electionYear,
+	let candidate;
+	try {
+		candidate = await prisma.candidate.findFirst({
+			where: {
+				OR: [
+					{ id: params.candidateId },
+					{
+						election: {
+							election_year: params.electionYear,
+						},
+						slug: params.candidateId,
 					},
-					slug: params.candidateId,
-				},
-			],
-		},
-		include: {
-			election: true,
-			Answer: {
-				include: {
-					question: true,
+				],
+			},
+			include: {
+				election: true,
+				Answer: {
+					include: {
+						question: true,
+					},
 				},
 			},
-		},
-	});
+		});
+	} catch (e) {
+		redirect(`/elections/${params.electionYear}`);
+	}
 	if (candidate && candidate.slug && candidate.slug !== params.candidateId) {
 		redirect(`/elections/${params.electionYear}/candidates/${candidate.slug}`);
 	}
 	if (!candidate) {
 		redirect(`/elections/${params.electionYear}`);
 	}
-	await prisma.candidate.update({
-		where: {
-			id: candidate.id,
-		},
-		data: {
-			views: {
-				increment: 1,
+	try {
+		await prisma.candidate.update({
+			where: {
+				id: candidate.id,
 			},
-		},
-	});
+			data: {
+				views: {
+					increment: 1,
+				},
+			},
+		});
+	} catch (e) {}
 	const fullName = `${candidate.officialName} ${candidate.officialSurname}`;
 
 	return (
 		<>
-			<Button isIconOnly as={Link} href={`/elections/${candidate.election.election_year}/candidates`} className="absolute bg-content1/60 border m-5 rounded-full">
-				<Icon icon="solar:alt-arrow-left-outline" width={24} className="text-white" />
-			</Button>
+			<BackButton />
 			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto  py-24 px-4">
 				<div className="flex max-w-xl flex-col text-center mx-auto items-center">
 					<Avatar showFallback className="h-40 w-40 mx-auto" isBordered src={`/api/users/${candidate.id}/avatar`} />

@@ -9,7 +9,7 @@ import { Montserrat } from "next/font/google";
 import { cn } from "@/lib/cn";
 import { Spotlight } from "@/components/ui/Spotlight";
 import prisma from "@/prisma/client";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import PwaDetector from "./PwaDetector";
 import PwaNavbar from "./PwaNavbar";
 import { TopFlower } from "./flowers";
@@ -26,14 +26,23 @@ const montserrat = Montserrat({
 });
 
 export default async function RootLayout({ children }) {
-	const faqs = await prisma.faq.count();
-	const currentElection = await prisma.election.findFirst({
-		where: {
-			is_current: true,
-		},
-	});
+	let faqs = 0,
+		currentElection = null;
+	try {
+		const [faqs, currentElection] = await Promise.all([
+			prisma.faq.count(),
+			prisma.election.findFirst({
+				where: {
+					is_current: true,
+				},
+			}),
+		]);
+	} catch (e) {
+		notFound();
+	}
+
 	return (
-		<html lang="en" className={cn(montserrat.className, "dark")}>
+		<html lang="en" className={cn(montserrat.className, "")}>
 			<head>
 				<link rel="manifest" href="/manifest.json" />
 				<link rel="apple-touch-startup-image" href="/app-loader.png"></link>
@@ -43,10 +52,10 @@ export default async function RootLayout({ children }) {
 					<NextUIProvider>
 						<Navbar faqsCount={faqs} currentElection={currentElection} />
 						<PwaNavbar />
-						<main className="flex min-h-screen w-screen overflow-x-hidden shadow-md bg-black flex-col items-center justify-between">
+						<main className="flex min-h-screen w-screen overflow-x-hidden shadow-md dark:bg-black bg-white flex-col items-center justify-between">
 							<TopFlower />
-							<div className="bg-dot-white/25 z-[2] min-h-screen w-full rounded-b-[20px]">
-								<Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
+							<div className="dark:bg-dot-white/25 bg-dot-black/25 z-[2] min-h-screen w-full rounded-b-[20px]">
+								<Spotlight className="-top-40 left-0 md:left-60 md:-top-20 light:hidden" fill="white" />
 								<PwaDetector />
 								{children}
 							</div>

@@ -147,15 +147,20 @@ export async function editSlogan(formData: FormData) {
 	const sessionCandidateId = session.user.candidate.id;
 	if (candidateId !== sessionCandidateId) return { ok: false, message: "Unauthorized" };
 
-	const selectedElection = await prisma.election.findFirst({
-		where: {
-			Candidate: {
-				some: {
-					id: candidateId as string,
+	let selectedElection;
+	try {
+		selectedElection = await prisma.election.findFirst({
+			where: {
+				Candidate: {
+					some: {
+						id: candidateId as string,
+					},
 				},
 			},
-		},
-	});
+		});
+	} catch (e) {
+		return { ok: false, message: "An error occurred while editing slogan" };
+	}
 
 	if (!selectedElection.edit_slogan) return { ok: false, message: "You can't edit your campaign" };
 
@@ -191,15 +196,20 @@ export async function editBio(formData: FormData) {
 	const sessionCandidateId = session.user.candidate.id;
 	if (candidateId !== sessionCandidateId) return { ok: false, message: "Unauthorized" };
 
-	const selectedElection = await prisma.election.findFirst({
-		where: {
-			Candidate: {
-				some: {
-					id: candidateId as string,
+	let selectedElection;
+	try {
+		selectedElection = await prisma.election.findFirst({
+			where: {
+				Candidate: {
+					some: {
+						id: candidateId as string,
+					},
 				},
 			},
-		},
-	});
+		});
+	} catch (e) {
+		return { ok: false, message: "An error occurred while editing slogan" };
+	}
 
 	if (!selectedElection.edit_bio) return { ok: false, message: "You can't edit your bio" };
 
@@ -230,16 +240,21 @@ export async function addCandidateAnswers(formData: FormData) {
 	const electionYear = formData.get("electionYear") as string;
 	const formDataEntries = Array.from(formData.entries());
 
-	const selectedElection = await prisma.election.findFirst({
-		where: {
-			Candidate: {
-				some: {
-					id: candidateId,
+	let selectedElection;
+	try {
+		selectedElection = await prisma.election.findFirst({
+			where: {
+				Candidate: {
+					some: {
+						id: candidateId,
+					},
 				},
+				election_year: electionYear,
 			},
-			election_year: electionYear,
-		},
-	});
+		});
+	} catch (e) {
+		return { ok: false, message: "An error occurred while adding answers" };
+	}
 
 	if (!selectedElection.edit_questions) return { ok: false, message: "You can't edit your answers" };
 
@@ -250,18 +265,22 @@ export async function addCandidateAnswers(formData: FormData) {
 		})
 		.filter(({ answer }) => answer.trim().length > 0);
 
-	await prisma.$transaction([
-		prisma.answer.deleteMany({ where: { candidate: { id: candidateId, election: { election_year: electionYear } } } }),
-		...answersArray.map((answer) =>
-			prisma.answer.create({
-				data: {
-					candidate: { connect: { id: candidateId } },
-					question: { connect: { id: answer.question_id } },
-					content: answer.answer,
-				},
-			})
-		),
-	]);
+	try {
+		await prisma.$transaction([
+			prisma.answer.deleteMany({ where: { candidate: { id: candidateId, election: { election_year: electionYear } } } }),
+			...answersArray.map((answer) =>
+				prisma.answer.create({
+					data: {
+						candidate: { connect: { id: candidateId } },
+						question: { connect: { id: answer.question_id } },
+						content: answer.answer,
+					},
+				})
+			),
+		]);
+	} catch (e) {
+		return { ok: false, message: "An error occurred while adding answers" };
+	}
 
 	return { ok: true, message: "Answers added successfully" };
 }

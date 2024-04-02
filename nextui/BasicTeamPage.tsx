@@ -8,7 +8,7 @@ import { Link as NextUILink } from "@nextui-org/link";
 import TeamMemberCard from "./team-member-card";
 import Icon from "@/components/ui/Icon";
 import Confetti from "@/components/ui/confetti";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import prisma from "@/prisma/client";
 import { Avatar, AvatarGroup } from "@nextui-org/avatar";
 
@@ -17,34 +17,38 @@ export default async function Component({ election, hideDescription = false, hid
 		boyWinners = [];
 	if (election.publish_results) {
 		hideButtons = true;
-		girlWinners = prisma.candidate.findMany({
-			where: {
-				type: "GIRL",
-				election: {
-					id: election.id,
+		try {
+			girlWinners = prisma.candidate.findMany({
+				where: {
+					type: "GIRL",
+					election: {
+						id: election.id,
+					},
 				},
-			},
-			orderBy: {
-				Vote: {
-					_count: "desc",
+				orderBy: {
+					Vote: {
+						_count: "desc",
+					},
 				},
-			},
-			take: 2,
-		});
-		boyWinners = prisma.candidate.findMany({
-			where: {
-				type: "BOY",
-				election: {
-					id: election.id,
+				take: 2,
+			});
+			boyWinners = prisma.candidate.findMany({
+				where: {
+					type: "BOY",
+					election: {
+						id: election.id,
+					},
 				},
-			},
-			orderBy: {
-				Vote: {
-					_count: "desc",
+				orderBy: {
+					Vote: {
+						_count: "desc",
+					},
 				},
-			},
-			take: 2,
-		});
+				take: 2,
+			});
+		} catch (error) {
+			notFound();
+		}
 		[girlWinners, boyWinners] = await Promise.all([girlWinners, boyWinners]);
 	}
 
@@ -54,13 +58,13 @@ export default async function Component({ election, hideDescription = false, hid
 				style={{
 					backgroundImage: `url(/api/users/${candidate.id}/avatar)`,
 				}}
-				className={`bg-content1/60 bg-cover border rounded-3xl md:hover:rotate-2 md:hover:translate-x-2 duration-300 overflow-hidden aspect-square`}>
-				<div className="flex w-auto h-full bg-gradient-to-b from-transparent to-black via-black/60">
+				className={`bg-content1/60 max-w-[256px] bg-cover border rounded-3xl md:hover:rotate-2 md:hover:translate-x-2 duration-300 overflow-hidden aspect-square`}>
+				<div className="flex w-auto h-full bg-gradient-to-b from-transparent to-black via-65% via-black/60">
 					<div className="mt-auto p-6">
-						<h3 className="mt-auto font-medium text-sm md:text-lg">
+						<h3 className="mt-auto text-white font-medium text-sm md:text-lg">
 							{candidate?.officialName} {candidate?.officialSurname}
 						</h3>
-						<span className="md:text-small text-xs text-default-500 ">{text}</span>
+						<span className="md:text-small text-xs text-default-400 ">{text}</span>
 					</div>
 				</div>
 			</div>
@@ -70,20 +74,18 @@ export default async function Component({ election, hideDescription = false, hid
 	return (
 		<>
 			{election.publish_results && <Confetti />}
-			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto min-h-screen items-center py-24 px-4">
+			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto items-center py-8 md:py-10 px-4">
 				<div className="flex max-w-xl flex-col text-center">
 					{!!election.Candidate.length && (
 						<>
 							<h2 className="font-medium text-white/70">{election.election_year} Student Elections</h2>
-							{/* 							<h1 className="text-4xl md:text-6xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">{!election.is_current ? "Meet the winners." : "Meet the candidates."}</h1>
-							 */}
 							<h1 className="text-4xl font-medium tracking-tight">{election.publish_results ? "Meet the winners." : "Meet the candidates."}</h1>
 							<Spacer y={1} />
 						</>
 					)}
 					{!!election.Candidate.length && (
 						<>
-							<h2 className="text-large text-default-500">{election.publish_results ? "United in vision and poised for action, our elected leaders are ready to make an impact." : "Our philosophy is to build a great team and then empower them to do great things."}</h2>
+							<h2 className="md:text-large text-medium text-default-500">{election.publish_results ? "United in vision and poised for action, our new leaders are ready to make an impact." : "Our philosophy is to build a great team and then empower them to do great things."}</h2>
 							<Spacer y={4} />
 						</>
 					)}
@@ -99,7 +101,7 @@ export default async function Component({ election, hideDescription = false, hid
 					)}
 				</div>
 				{!!election.Candidate.length && !election.publish_results && (
-					<div className="mt-12 grid w-full grid-cols-1 gap-4 auto-rows-fr md:grid-cols-2 lg:grid-cols-3">
+					<div className="mt-12  grid w-full grid-cols-1 gap-4 auto-rows-fr md:grid-cols-2 lg:grid-cols-3">
 						{election.Candidate.map((member, index) => (
 							<TeamMemberCard electionYear={election.election_year} index={index} key={index} {...member} />
 						))}
@@ -122,22 +124,22 @@ export default async function Component({ election, hideDescription = false, hid
 					</div>
 				)}
 				{election.publish_results && (
-					<Button as={Link} href={`/elections/${election.election_year}/candidates`} className="bg-content1/60 w-max p-2 px-6 border rounded-full mx-auto bottom-0 mt-auto">
+					<Button as={Link} href={`/elections/${election.election_year}/candidates`} className="bg-content1/60 w-max p-2 px-6 border rounded-full bottom-0 mt-2">
 						View All Candidates
 					</Button>
 				)}
 			</section>
 			{!!election.Candidate.length && election.is_current && !election.publish_results && (
 				<div className="mb-20 pwa:hidden flex">
-					<div className="text-tiny md:hover:bg-white md:hover:text-black duration-300 cursor-pointer bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
+					<div className="text-tiny dark:md:hover:bg-white bg-white md:hover:text-black border duration-300 cursor-pointer dark:bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
 						<Icon icon="material-symbols:info" width={24} />
-						<p className="my-auto ml-2">Candidates are shuffled every minute</p>
+						<p className="my-auto ml-2">Candidates are shuffled on every page visit</p>
 					</div>
 				</div>
 			)}
 			{!!election.Candidate.length && !election.is_current && (
 				<div className="mb-20 pwa:hidden flex">
-					<div className="text-tiny md:hover:bg-white md:hover:text-black duration-300 cursor-pointer bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
+					<div className="text-tiny dark:md:hover:bg-white bg-white md:hover:text-black border duration-300 cursor-pointer dark:bg-neutral-800 mx-auto p-1 pr-3 pl-1 rounded-full flex pt-auto text-center w-auto text-neutral-400">
 						<Icon icon="material-symbols:info" width={24} />
 						<p className="my-auto ml-2">Candidates are in alphabetical order</p>
 					</div>

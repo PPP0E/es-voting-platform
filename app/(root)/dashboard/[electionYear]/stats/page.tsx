@@ -4,26 +4,32 @@ import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { IncreasingStat } from "./IncreasingStat";
+import { notFound } from "next/navigation";
 
 export default async function Page({ params }) {
-	const candidates = await prisma.candidate.findMany({
-		where: {
-			election: {
-				election_year: params.electionYear,
+	let candidates;
+	try {
+		candidates = await prisma.candidate.findMany({
+			where: {
+				election: {
+					election_year: params.electionYear,
+				},
 			},
-		},
-		select: {
-			id: true,
-			officialName: true,
-			officialSurname: true,
-			views: true,
-			type: true,
-			slug: true,
-		},
-		orderBy: {
-			views: "desc",
-		},
-	});
+			select: {
+				id: true,
+				officialName: true,
+				officialSurname: true,
+				views: true,
+				type: true,
+				slug: true,
+			},
+			orderBy: {
+				views: "desc",
+			},
+		});
+	} catch (e) {
+		notFound();
+	}
 
 	const girlCandidates = candidates.filter((candidate) => candidate.type === "GIRL");
 	const boyCandidates = candidates.filter((candidate) => candidate.type === "BOY");

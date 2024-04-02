@@ -61,7 +61,7 @@ export default auth((req) => {
 		return NextResponse.redirect(new URL(`/login?return=${nextUrl.pathname}`, nextUrl.origin));
 	}
 
-	if (nextUrl.pathname.includes("/vote") && isAuthenticated && !req.auth.user.candidate) {
+	if (nextUrl.pathname.includes("/profile") && isAuthenticated && !req.auth.user.candidate) {
 		return NextResponse.redirect(new URL("/", nextUrl.origin));
 	}
 });

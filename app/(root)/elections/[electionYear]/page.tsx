@@ -4,37 +4,42 @@ import { redirect } from "next/navigation";
 
 export default async function Component({ params }) {
 	const { electionYear } = params;
-	let selectedElection = await prisma.election.findFirst({
-		where: {
-			election_year: electionYear,
-			is_visible: true,
-		},
-		select: {
-			id: true,
-			Candidate: {
-				select: {
-					officialName: true,
-					officialSurname: true,
-					type: true,
-					photo: true,
-					slogan: true,
-					instagram: true,
-					facebook: true,
-					twitter: true,
-					bereal: true,
-					snapchat: true,
-					website: true,
-					youtube: true,
-					slug: true,
-					id: true,
-				},
+	let selectedElection;
+	try {
+		selectedElection = await prisma.election.findFirst({
+			where: {
+				election_year: electionYear,
+				is_visible: true,
 			},
-			is_current: true,
-			election_year: true,
-			is_visible: true,
-			publish_results: true,
-		},
-	});
+			select: {
+				id: true,
+				Candidate: {
+					select: {
+						officialName: true,
+						officialSurname: true,
+						type: true,
+						photo: true,
+						slogan: true,
+						instagram: true,
+						facebook: true,
+						twitter: true,
+						bereal: true,
+						snapchat: true,
+						website: true,
+						youtube: true,
+						slug: true,
+						id: true,
+					},
+				},
+				is_current: true,
+				election_year: true,
+				is_visible: true,
+				publish_results: true,
+			},
+		});
+	} catch (e) {
+		redirect("/elections");
+	}
 	if (!selectedElection) redirect("/elections");
 
 	if (selectedElection.is_current) {

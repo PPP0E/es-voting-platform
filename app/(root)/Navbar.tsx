@@ -4,12 +4,15 @@ import React, { useEffect, useState } from "react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Link, Button, Spacer, Chip, Divider, DropdownSection } from "@nextui-org/react";
 import Image from "next/image";
 import { Link as NextLink } from "next/link";
-import ESLogo from "@/public/assets/branding/logos/es-logo-white.svg";
+import ESLogoWhite from "@/public/assets/branding/logos/es-logo-white.svg";
+import ESLogoBlack from "@/public/assets/branding/logos/es-logo.svg";
+
 import { signOut, useSession } from "next-auth/react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 import { Icon } from "@iconify/react";
 import { isVotingRunning } from "@/lib/isVotingRunning";
+import ThemeSwitch from "@/nextui/theme-switch";
 
 export default function Component({ faqsCount, currentElection }) {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,7 +47,8 @@ export default function Component({ faqsCount, currentElection }) {
 				<NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} className="sm:hidden" />
 				<NavbarBrand className="w-full">
 					<Link href="/">
-						<Image src={ESLogo} alt="The English School Logo" className="min-w-[200px]" width={210} />
+						<Image src={ESLogoWhite} alt="The English School Logo" className="min-w-[200px] hidden dark:block" width={210} />
+						<Image src={ESLogoBlack} alt="The English School Logo" className="min-w-[200px] dark:hidden" width={210} />
 					</Link>
 					<Spacer x={2} />
 					<Icon icon="solar:alt-arrow-right-linear" className="my-auto mr-1 hidden md:block" width={24} />
