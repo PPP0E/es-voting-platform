@@ -64,7 +64,7 @@ export default async function Component({ election, hideDescription = false, hid
 						<h3 className="mt-auto text-white font-medium text-sm md:text-lg">
 							{candidate?.officialName} {candidate?.officialSurname}
 						</h3>
-						<span className="md:text-small text-xs text-default-400 ">{text}</span>
+						<span className="md:text-small text-xs text-default-400">{text}</span>
 					</div>
 				</div>
 			</div>
@@ -74,11 +74,11 @@ export default async function Component({ election, hideDescription = false, hid
 	return (
 		<>
 			{election.publish_results && <Confetti />}
-			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto items-center py-8 md:py-10 px-4">
+			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto items-center py-16 md:py-14 px-4">
 				<div className="flex max-w-xl flex-col text-center">
 					{!!election.Candidate.length && (
 						<>
-							<h2 className="font-medium text-white/70">{election.election_year} Student Elections</h2>
+							<h2 className="font-medium dark:text-white/70">{election.election_year} Student Elections</h2>
 							<h1 className="text-4xl font-medium tracking-tight">{election.publish_results ? "Meet the winners." : "Meet the candidates."}</h1>
 							<Spacer y={1} />
 						</>
