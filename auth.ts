@@ -86,6 +86,7 @@ export const authConfig: NextAuthConfig = {
 							},
 						});
 					} catch (error) {
+						console.error(error);
 						return null;
 					}
 
@@ -127,6 +128,7 @@ export const authConfig: NextAuthConfig = {
 								}
 							}
 						} catch (error) {
+							console.error(error);
 							return null;
 						}
 
