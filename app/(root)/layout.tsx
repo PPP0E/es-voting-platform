@@ -50,8 +50,6 @@ export default async function RootLayout({ children }) {
 								<PwaDetector />
 								{children}
 							</div>
-							{/* 							<BottomFlower />
-							 */}
 						</main>
 						<Toaster />
 						<CenteredFooterWithSocialLinks />
