@@ -86,7 +86,6 @@ export const authConfig: NextAuthConfig = {
 							},
 						});
 					} catch (error) {
-						console.error(error);
 						return null;
 					}
 
@@ -109,29 +108,29 @@ export const authConfig: NextAuthConfig = {
 						studentUserObject = { fullName, email, profilePictureUrl };
 						studentObject = { id: studentId, yearGroup, formGroup };
 
-						try {
-							candidateQuery = await prisma.candidate.findUnique({
-								where: {
-									election_id_student_id: {
-										election_id: currentElectionId?.id,
-										student_id: username as string,
+						if (currentElectionId) {
+							try {
+								candidateQuery = await prisma.candidate.findUnique({
+									where: {
+										election_id_student_id: {
+											election_id: currentElectionId?.id,
+											student_id: username as string,
+										},
 									},
-								},
-							});
-							if (!adminObject || !adminUserObject) {
-								adminQuery = await prisma.admin.findFirst({
-									where: { OR: [{ email: username }, { email: studentEmail }] },
 								});
-								if (adminQuery) {
-									adminObject = { id: adminQuery.id };
-									adminUserObject = { fullName: adminQuery.fullName, email: adminQuery.email };
+								if (!adminObject || !adminUserObject) {
+									adminQuery = await prisma.admin.findFirst({
+										where: { OR: [{ email: username }, { email: studentEmail }] },
+									});
+									if (adminQuery) {
+										adminObject = { id: adminQuery.id };
+										adminUserObject = { fullName: adminQuery.fullName, email: adminQuery.email };
+									}
 								}
+							} catch (error) {
+								return null;
 							}
-						} catch (error) {
-							console.error(error);
-							return null;
 						}
-
 						if (candidateQuery) {
 							candidateUserObject = { fullName: candidateQuery.officialName + " " + candidateQuery.officialSurname, email: candidateQuery.schoolEmail, password: candidateQuery.password, id: candidateQuery.id };
 							candidateObject = { id: candidateQuery.id };
@@ -151,7 +150,6 @@ export const authConfig: NextAuthConfig = {
 
 				let userAttributes = {};
 				if (studentObject) userAttributes = { student: studentObject, ...userAttributes };
-				console.log(adminObject, adminUserObject);
 				if (adminObject) userAttributes = { admin: adminObject, ...userAttributes };
 				if (candidateObject) userAttributes = { candidate: candidateObject, ...userAttributes };
 
@@ -163,7 +161,7 @@ export const authConfig: NextAuthConfig = {
 	],
 	trustHost: true,
 	logger: {
-		error: console.error,
+		error: () => {},
 		warn: () => {},
 		debug: () => {},
 	},
