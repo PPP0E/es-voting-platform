@@ -161,7 +161,7 @@ export const authConfig: NextAuthConfig = {
 	],
 	trustHost: true,
 	logger: {
-		error: process.env.NODE_ENV === "production" ? () => {} : () => {},
+		error: console.error,
 		warn: () => {},
 		debug: () => {},
 	},
