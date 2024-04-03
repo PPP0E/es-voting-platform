@@ -308,7 +308,6 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 
 	useEffect(() => {
 		if (debouncedElectionDate !== selectedElection.election_date) {
-			console.log(debouncedElectionDate);
 			setElectionDateHandler();
 		}
 	}, [debouncedElectionDate]);
@@ -324,10 +323,6 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 			updateEndTimeHandler();
 		}
 	}, [debouncedElectionEndTime]);
-
-	useEffect(() => {
-		console.log(electionDate);
-	}, [electionDate]);
 
 	return (
 		<>

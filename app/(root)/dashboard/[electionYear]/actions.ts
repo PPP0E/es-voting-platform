@@ -303,7 +303,6 @@ export async function updateElectionDate(electionId: string, date: string) {
 			},
 		});
 	} catch (e) {
-		console.log(e);
 		return { ok: false, message: "An error occurred" };
 	}
 	return { ok: true, message: "Election date updated" };

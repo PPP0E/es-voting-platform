@@ -75,7 +75,6 @@ export default function Component() {
 		const footer = document.getElementById("footer");
 		setHeight(footer.clientHeight + "px");
 	}, []);
-	console.log(theme);
 
 	return (
 		<>

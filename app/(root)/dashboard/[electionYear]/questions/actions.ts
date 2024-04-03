@@ -75,7 +75,6 @@ export async function deleteQuestion(id: string, electionYear: string) {
 			...currentQuestions.filter((question) => question.id !== id).map((question, index) => prisma.question.update({ where: { id: question.id, election: { election_year: electionYear } }, data: { index } })),
 		]);
 	} catch (e) {
-		console.log(e);
 		return { ok: false, message: "An error occurred while deleting the question" };
 	}
 	return { ok: true, message: "Question deleted successfully" };

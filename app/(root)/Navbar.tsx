@@ -47,14 +47,11 @@ export default function Component({ faqsCount, currentElection }) {
 				<NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} className="sm:hidden" />
 				<NavbarBrand className="w-full">
 					<Link href="/">
-						<Image src={ESLogoWhite} alt="The English School Logo" className="min-w-[200px] hidden dark:block" width={210} />
-						<Image src={ESLogoBlack} alt="The English School Logo" className="min-w-[200px] dark:hidden" width={210} />
+						<Image src={ESLogoWhite} alt="The English School Logo" className="min-w-[164px] hidden dark:block" width={210} />
+						<Image src={ESLogoBlack} alt="The English School Logo" className="min-w-[164px] dark:hidden" width={210} />
 					</Link>
 					<Spacer x={2} />
 					<Icon icon="solar:alt-arrow-right-linear" className="my-auto mr-1 hidden md:block" width={24} />
-					{/* 					<Chip size="sm" className="my-auto pt-1 hidden md:block px-2">
-						Student Elections
-					</Chip> */}
 					<p className="hidden md:block">Student Elections</p>
 				</NavbarBrand>
 			</NavbarContent>
@@ -82,9 +79,9 @@ export default function Component({ faqsCount, currentElection }) {
 					</NavbarItem>
 				)}
 				{status === "authenticated" && session.user?.student && isElectionRunning && (
-					<NavbarItem as={Link} href="/vote" className="hidden md:flex" isActive={pathname == "/vote"}>
+					<NavbarItem as={Link} href="/vote" className="flex" isActive={pathname == "/vote"}>
 						<Button className="rounded-full text-md" size="sm" color="danger">
-							<span className="animate-pulse px-2">Vote</span>
+							<span className="animate-pulse px-1">Vote</span>
 						</Button>
 					</NavbarItem>
 				)}

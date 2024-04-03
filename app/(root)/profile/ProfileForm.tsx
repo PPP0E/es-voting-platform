@@ -110,7 +110,6 @@ export function ProfileForm({ selectedCandidate }) {
 			setIsLoading(true);
 		});
 		formData.append("electionYear", selectedCandidate.election.election_year);
-		console.log(selectedCandidate);
 		formData.append("candidateId", selectedCandidate?.id);
 		const res = await addCandidateAnswers(formData);
 		if (!res?.ok) {
