@@ -12,7 +12,7 @@ import prisma from "@/prisma/client";
 import { notFound, redirect } from "next/navigation";
 import PwaDetector from "./PwaDetector";
 import PwaNavbar from "./PwaNavbar";
-import { GreenRose, TopFlower } from "./flowers";
+import TopFl, { BottomFl } from "./flprovider";
 
 export const metadata = {
 	title: "The English School Student Elections",
@@ -52,8 +52,8 @@ export default async function RootLayout({ children }) {
 						<Navbar faqsCount={faqs} currentElection={currentElection} />
 						<PwaNavbar />
 						<main className="flex min-h-screen w-screen overflow-x-hidden shadow-md dark:bg-black bg-white flex-col items-center justify-between">
-							<TopFlower />
-							<GreenRose />
+							<TopFl />
+							<BottomFl />
 							<div className="dark:bg-dot-white/25 bg-dot-black/25 z-[2] min-h-screen w-full rounded-b-[20px]">
 								<Spotlight className="-top-40 left-0 md:left-60 md:-top-20 light:hidden" fill="white" />
 								<PwaDetector />
