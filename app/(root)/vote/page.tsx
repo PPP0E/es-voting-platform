@@ -24,19 +24,24 @@ export default async function Component({ params }) {
 	}
 	if (!currentElection || !session || !session?.user?.student) redirect("/");
 
-	const votes = await prisma.vote.findMany({
-		where: {
-			student_id: session?.user?.student?.id,
-			Candidate: {
-				election: {
-					id: currentElection.id,
+	let votes;
+	try {
+		votes = await prisma.vote.findMany({
+			where: {
+				student_id: session?.user?.student?.id,
+				Candidate: {
+					election: {
+						id: currentElection.id,
+					},
 				},
 			},
-		},
-		select: {
-			id: true,
-		},
-	});
+			select: {
+				id: true,
+			},
+		});
+	} catch (e) {
+		redirect("/");
+	}
 	let initialPage = 1;
 	if (votes.length > 0) {
 		initialPage = 2;
@@ -44,7 +49,7 @@ export default async function Component({ params }) {
 
 	const isElectionRunning = isVotingRunning(currentElection);
 
-	if (!session || !isElectionRunning || !session.user.student || !session) redirect("/");
+	if (!session || !isElectionRunning || !session?.user?.student || !session) redirect("/");
 	return (
 		<section className="flex pwa:hidden max-w-5xl flex-col mx-auto items-center py-24 px-4">
 			<VoteSelector votes={votes} initialPage={initialPage} currentElection={currentElection} />

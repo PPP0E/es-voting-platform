@@ -68,17 +68,17 @@ export default function Component({ faqsCount, currentElection }) {
 				<NavbarItem as={Link} href="/elections" className="hidden md:flex" isActive={pathname == "/elections"}>
 					Elections
 				</NavbarItem>
-				{status === "authenticated" && session.user?.candidate && (
+				{status === "authenticated" && session?.user?.candidate && (
 					<NavbarItem as={Link} href="/profile" className="hidden md:flex" isActive={pathname == "/profile"}>
 						Profile
 					</NavbarItem>
 				)}
-				{status === "authenticated" && session.user?.admin && (
+				{status === "authenticated" && session?.user?.admin && (
 					<NavbarItem as={Link} href="/dashboard" className="hidden md:flex" isActive={pathname == "/dashboard"}>
 						Dashboard
 					</NavbarItem>
 				)}
-				{status === "authenticated" && session.user?.student && isElectionRunning && (
+				{status === "authenticated" && session?.user?.student && isElectionRunning && (
 					<NavbarItem as={Link} href="/vote" className="flex" isActive={pathname == "/vote"}>
 						<Button className="rounded-full text-md" size="sm" color="danger">
 							<span className="animate-pulse px-1">Vote</span>
@@ -96,25 +96,25 @@ export default function Component({ faqsCount, currentElection }) {
 					<NavbarItem className="flex gap-2 align-middle justify-center">
 						<Dropdown placement="bottom-end">
 							<DropdownTrigger>
-								<Avatar isBordered as="button" className="transition-transform" showFallback size="sm" name={nameInitials} src={session.user.profilePictureUrl} />
+								<Avatar isBordered as="button" className="transition-transform" showFallback size="sm" name={nameInitials} src={session?.user?.profilePictureUrl} />
 							</DropdownTrigger>
 							<DropdownMenu>
 								<DropdownItem key="profile" className="gap-2 disabled:!text-white">
-									<p className="font-thin">Signed in as</p> <p className="font-semibold">{session.user.fullName}</p>
-									{session.user.student && (
+									<p className="font-thin">Signed in as</p> <p className="font-semibold">{session?.user?.fullName}</p>
+									{session?.user?.student && (
 										<p className="font-light">
-											{session.user.student.id} • {session.user.student.formGroup}
+											{session?.user?.student?.id} • {session?.user?.student?.formGroup}
 										</p>
 									)}
-									{session.user.admin && (
+									{session?.user?.admin && (
 										<>
-											{!session.user.student && <p className="font-light">{session.user.email}</p>}
+											{!session?.user?.student && <p className="font-light">{session?.user?.email}</p>}
 											<p className="font-light">Admin</p>
 										</>
 									)}
-									{session.user.candidate && <p className="font-light">Candidate</p>}
+									{session?.user?.candidate && <p className="font-light">Candidate</p>}
 								</DropdownItem>
-								{session.user.candidate && (
+								{session?.user?.candidate && (
 									<DropdownItem variant="flat" href="/profile">
 										Profile
 									</DropdownItem>
