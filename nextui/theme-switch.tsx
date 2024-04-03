@@ -41,7 +41,7 @@ const ThemeSwitch = React.forwardRef<HTMLDivElement, Omit<RadioGroupProps, "chil
 			...classNames,
 			wrapper: cn("gap-0 items-center", classNames?.wrapper),
 		}}
-		defaultValue="dark"
+		defaultValue="light"
 		orientation="horizontal"
 		{...props}>
 		<ThemeRadioItem icon="solar:moon-linear" value="dark" />
