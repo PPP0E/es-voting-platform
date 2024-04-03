@@ -1,5 +1,4 @@
 export function isVotingRunning(selectedElection) {
-	return true;
 	if (!selectedElection) return false;
 	const isElectionCurrent = selectedElection.is_current;
 	const isElectionVisible = selectedElection.is_visible;
