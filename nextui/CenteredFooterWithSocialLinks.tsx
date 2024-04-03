@@ -78,7 +78,7 @@ export default function Component() {
 
 	return (
 		<>
-			<ThemeSwitch onChange={(e) => setTheme(e.target.value)} className="bottom-2 bg-content1/60 border rounded-full p-[2px] z-[2] right-2 fixed" />
+			<ThemeSwitch value={theme} onChange={(e) => setTheme(e.target.value)} className="bottom-2 bg-content1/60 border rounded-full p-[2px] z-[2] right-2 fixed" />
 			<div style={{ height: height }} className="p-3 w-full pwa:hidden opacity-0 absolute"></div>
 			<footer id="footer" className="p-3 fixed pwa:hidden w-full z-[-2] bottom-0">
 				<div className="flex w-full flex-col">

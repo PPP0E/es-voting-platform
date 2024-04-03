@@ -26,10 +26,9 @@ const montserrat = Montserrat({
 });
 
 export default async function RootLayout({ children }) {
-	let faqs = 0,
-		currentElection = null;
+	let faqs, currentElection;
 	try {
-		const [faqs, currentElection] = await Promise.all([
+		[faqs, currentElection] = await Promise.all([
 			prisma.faq.count(),
 			prisma.election.findFirst({
 				where: {
