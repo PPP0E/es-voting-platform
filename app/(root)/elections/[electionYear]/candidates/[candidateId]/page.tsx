@@ -48,18 +48,20 @@ export default async function Component({ params }) {
 	if (!candidate) {
 		redirect(`/elections/${params.electionYear}`);
 	}
-	try {
-		await prisma.candidate.update({
-			where: {
-				id: candidate.id,
-			},
-			data: {
-				views: {
-					increment: 1,
+	if (!session?.user?.admin && !session?.user?.candidate) {
+		try {
+			await prisma.candidate.update({
+				where: {
+					id: candidate.id,
 				},
-			},
-		});
-	} catch (e) {}
+				data: {
+					views: {
+						increment: 1,
+					},
+				},
+			});
+		} catch (e) {}
+	}
 	const fullName = `${candidate.officialName} ${candidate.officialSurname}`;
 
 	return (
