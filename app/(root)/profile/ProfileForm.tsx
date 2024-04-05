@@ -170,7 +170,7 @@ export function ProfileForm({ selectedCandidate }) {
 
 	return (
 		<>
-			<section className="flex max-w-5xl flex-col mx-auto items-center md:py-24 duration-300 px-4">
+			<section className="flex max-w-5xl flex-col mx-auto my-4 items-center md:py-24 duration-300 px-4">
 				<div className={cn("p-2 flex flex-col gap-4 md:w-[500px]")}>
 					<Title title="Profile Picture">
 						<ProfilePictureFrame isDisabled={!selectedCandidate.election.edit_photo} candidate={selectedCandidate} />
