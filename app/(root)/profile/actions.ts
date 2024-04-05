@@ -2,8 +2,11 @@
 
 import { auth } from "@/auth";
 import { processBio, processSlogan, processSlug, processSocialMediaLink, processVideoUrl } from "@/lib/textOperations";
-import prisma from "@/prisma/client";
 import { z } from "zod";
+import prisma from "@/prisma/client";
+import { minio } from "@/minio/client";
+import { validate as uuidValidate } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 export async function editSocials(formData: FormData) {
 	const session = await auth();
@@ -283,4 +286,102 @@ export async function addCandidateAnswers(formData: FormData) {
 	}
 
 	return { ok: true, message: "Answers added successfully" };
+}
+
+export async function uploadProfilePicture(formData: FormData) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session?.user?.candidate) return { ok: false, message: "Unauthorized" };
+	const id = formData.get("id");
+	const photo = formData.get("photo") as File;
+	if (!uuidValidate(id)) return { ok: false, message: "Invalid candidate ID" };
+	if (!photo) return { ok: false, message: "Photo is required" };
+	if (!(session?.user?.candidate?.id == id)) return { ok: false, message: "Unauthorized" };
+
+	let selectedElection;
+	try {
+		selectedElection = await prisma.election.findFirst({
+			where: {
+				Candidate: {
+					some: {
+						id: id as string,
+					},
+				},
+			},
+		});
+	} catch (e) {
+		return { ok: false, message: "An error occurred while deleting the photo" };
+	}
+	if (!selectedElection.edit_photo) return { ok: false, message: "You can't delete your photo" };
+	if (photo.size > 10000000) return { ok: false, message: "The maximum file size is 10MB" };
+	if (!photo.type.includes("image")) return { ok: false, message: "File is not an image" };
+	if (photo.type !== "image/jpeg" && photo.type !== "image/png" && photo.type !== "image/gif") return { ok: false, message: "Supported image types are JPEG, PNG, and GIF" };
+
+	const data = await photo.arrayBuffer();
+	const buffer = Buffer.from(data);
+
+	const randomUUID = uuidv4();
+	const fileName = randomUUID + "." + photo.type.split("/")[1] || "";
+	const minioClient = minio();
+
+	try {
+		await prisma.$transaction(
+			async (tx) => {
+				await deleteProfilePicture(id);
+				await minioClient.putObject("eselections.org", `avatars/${fileName}`, buffer, null, {
+					"Content-Type": photo.type,
+				});
+				await tx.candidate.update({ where: { id }, data: { photo: fileName } });
+			},
+			{
+				maxWait: 5000,
+				timeout: 900000,
+			}
+		);
+	} catch (e) {
+		return { ok: false, message: "An error occurred while uploading the photo" };
+	}
+	return { ok: true, message: "Photo uploaded successfully" };
+}
+
+export async function deleteProfilePicture(candidateId) {
+	const session = await auth();
+	if (!session) return { ok: false, message: "Unauthorized" };
+	if (!session?.user?.candidate) return { ok: false, message: "Unauthorized" };
+	if (!uuidValidate(candidateId)) return { ok: false, message: "Invalid candidate ID" };
+	if (!(session?.user?.candidate?.id == candidateId)) return { ok: false, message: "Unauthorized" };
+	let selectedElection;
+	try {
+		selectedElection = await prisma.election.findFirst({
+			where: {
+				Candidate: {
+					some: {
+						id: candidateId,
+					},
+				},
+			},
+		});
+	} catch (e) {
+		return { ok: false, message: "An error occurred while deleting the photo" };
+	}
+	if (!selectedElection.edit_photo) return { ok: false, message: "You can't delete your photo" };
+	const minioClient = minio();
+	try {
+		await prisma.$transaction(
+			async (tx) => {
+				const candidateAvatar = await tx.candidate.findUnique({ where: { id: candidateId }, select: { photo: true } });
+				if (!candidateAvatar) return { ok: false, message: "Candidate not found" };
+				const avatar = candidateAvatar.photo;
+				await minioClient.removeObject("eselections.org", `avatars/${avatar}`);
+				await tx.candidate.update({ where: { id: candidateId }, data: { photo: null } });
+			},
+			{
+				maxWait: 5000,
+				timeout: 900000,
+			}
+		);
+	} catch (e) {
+		return { ok: false, message: "An error occurred while deleting the photo" };
+	}
+	return { ok: true, message: "Photo deleted successfully" };
 }

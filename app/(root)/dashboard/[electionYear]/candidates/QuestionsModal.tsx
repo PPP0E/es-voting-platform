@@ -32,7 +32,7 @@ export function QuestionsModal({ questions, selectedElection, candidate, answers
 	}
 
 	return (
-		<Modal scrollBehavior="inside" isOpen={!!searchParams.get("answers")} onClose={() => removeSearchParams({ answers: "" }, router)}>
+		<Modal placement="center" scrollBehavior="inside" isOpen={!!searchParams.get("answers")} onClose={() => removeSearchParams({ answers: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">
 					<h2>Edit Candidate Questions</h2>

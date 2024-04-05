@@ -54,10 +54,10 @@ export const authConfig: NextAuthConfig = {
 						adminObject = { id: adminQuery.id };
 					}
 				}
-				const currentElectionId = await prisma.election.findFirst({
+				/* 				const currentElectionId = await prisma.election.findFirst({
 					where: { is_current: true },
 					select: { id: true },
-				});
+				}); */
 
 				let weducLoginData: Dispatcher.ResponseData, weducUserProfileLocation: Dispatcher.ResponseData, weducUserData: Dispatcher.ResponseData;
 				const headers = { Host: "app.weduc.co.uk", "Sec-Ch-Ua-Mobile": "?0" };
@@ -108,28 +108,23 @@ export const authConfig: NextAuthConfig = {
 						studentUserObject = { fullName, email, profilePictureUrl };
 						studentObject = { id: studentId, yearGroup, formGroup };
 
-						if (currentElectionId) {
-							try {
-								candidateQuery = await prisma.candidate.findUnique({
-									where: {
-										election_id_student_id: {
-											election_id: currentElectionId?.id,
-											student_id: username as string,
-										},
-									},
+						try {
+							candidateQuery = await prisma.candidate.findFirst({
+								where: {
+									student_id: username as string,
+								},
+							});
+							if (!adminObject || !adminUserObject) {
+								adminQuery = await prisma.admin.findFirst({
+									where: { OR: [{ email: username }, { email: studentEmail }] },
 								});
-								if (!adminObject || !adminUserObject) {
-									adminQuery = await prisma.admin.findFirst({
-										where: { OR: [{ email: username }, { email: studentEmail }] },
-									});
-									if (adminQuery) {
-										adminObject = { id: adminQuery.id };
-										adminUserObject = { fullName: adminQuery.fullName, email: adminQuery.email };
-									}
+								if (adminQuery) {
+									adminObject = { id: adminQuery.id };
+									adminUserObject = { fullName: adminQuery.fullName, email: adminQuery.email };
 								}
-							} catch (error) {
-								return null;
 							}
+						} catch (error) {
+							return null;
 						}
 						if (candidateQuery) {
 							candidateUserObject = { fullName: candidateQuery.officialName + " " + candidateQuery.officialSurname, email: candidateQuery.schoolEmail, password: candidateQuery.password, id: candidateQuery.id };

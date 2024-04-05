@@ -13,6 +13,7 @@ export default async function Page() {
 			},
 			select: {
 				id: true,
+				photo: true,
 				student_id: true,
 				slug: true,
 				type: true,

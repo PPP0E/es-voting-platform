@@ -9,13 +9,15 @@ import { flushSync } from "react-dom";
 import Image from "next/image";
 import { removeSearchParams } from "@/lib/searchParams";
 
-export default function ManagementProfilePictureFrame({ candidate }) {
+export default function ProfilePictureFrame({ candidate, isDisabled }) {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const [url, setUrl] = useState(`/api/users/${candidate.id}/avatar`);
 	const [profilePictureInput, setProfilePictureInput] = useState("");
+	const [mounted, setMounted] = useState(false);
 
-	async function updateProfilePictureHandler(formData: FormData) {
+	async function updateProfilePictureHandler() {
+		let formData = new FormData(document.getElementById("pfpUpdater"));
 		flushSync(() => {
 			setLoading(true);
 		});
@@ -63,13 +65,20 @@ export default function ManagementProfilePictureFrame({ candidate }) {
 		setUrl(URL.createObjectURL(e.target.files[0]));
 	};
 
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) return null;
+
 	return (
 		<div className="flex flex-col">
 			<div className="flex">
 				<Avatar key={Math.random()} isBordered showFallback className="ml-1 mr-4 mt-1 aspect-square h-[100px] min-h-[100px] w-[100px] min-w-[100px] select-none object-cover" src={candidate.photo || profilePictureInput ? url : null} />
 				<div className="flex flex-col gap-2 rounded-2xl">
-					<form id="pfpUpdater" action={updateProfilePictureHandler}>
+					<form id="pfpUpdater">
 						<input
+							disabled={loading || isDisabled}
 							className="block w-full text-sm text-slate-500
       file:my-1 file:mr-4 file:rounded-full
       file:border-0 file:bg-black-600
@@ -85,11 +94,11 @@ export default function ManagementProfilePictureFrame({ candidate }) {
 					</form>
 					<div className="flex gap-4">
 						{candidate.photo && (
-							<Button isLoading={loading} onClick={removeProfilePictureHandler} isDisabled={loading} className="w-full" type="submit">
+							<Button isLoading={loading} onClick={removeProfilePictureHandler} isDisabled={loading || isDisabled} className="w-full" type="submit">
 								{!loading ? "Remove" : "Loading"}
 							</Button>
 						)}
-						<Button isLoading={loading} form="pfpUpdater" disabled={loading} isDisabled={loading || !profilePictureInput} className="w-full" type="submit">
+						<Button isLoading={loading} onPress={updateProfilePictureHandler} isDisabled={loading || !profilePictureInput || isDisabled} className="w-full">
 							{!loading ? "Upload" : "Uploading"}
 						</Button>
 					</div>

@@ -327,6 +327,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 	return (
 		<>
 			<Modal
+				placement="center"
 				onClose={() => {
 					setIsSetCurrentModalOpen(false);
 					setPassword("");
@@ -349,6 +350,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 				</ModalContent>
 			</Modal>
 			<Modal
+				placement="center"
 				onClose={() => {
 					setIsPublishModalOpen(false);
 					setPassword("");
@@ -375,6 +377,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 					setIsUnpublishModalOpen(false);
 					setPassword("");
 				}}
+				placement="center"
 				isOpen={isUnpublishModalOpen}>
 				<ModalContent>
 					<ModalHeader className="flex flex-col gap-1">Unpublish Results</ModalHeader>
@@ -393,6 +396,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 				</ModalContent>
 			</Modal>
 			<Modal
+				placement="center"
 				onClose={() => {
 					setIsDeleteAllVotesModalOpen(false);
 					setPassword("");
@@ -421,6 +425,7 @@ export default function Component({ selectedElection }: { selectedElection: Elec
 				</ModalContent>
 			</Modal>
 			<Modal
+				placement="center"
 				onClose={() => {
 					setIsDeleteElectionModalOpen(false);
 					setPassword("");

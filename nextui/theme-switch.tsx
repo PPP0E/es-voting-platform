@@ -2,9 +2,10 @@
 
 import type { RadioGroupProps, RadioProps } from "@nextui-org/react";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { RadioGroup, VisuallyHidden, useRadio, useRadioGroupContext } from "@nextui-org/react";
 import { Icon } from "@iconify/react";
+import { useTheme } from "next-themes";
 
 import { cn } from "./cn";
 
@@ -33,22 +34,33 @@ const ThemeRadioItem = ({ icon, ...props }: RadioProps & { icon: string }) => {
 	);
 };
 
-const ThemeSwitch = React.forwardRef<HTMLDivElement, Omit<RadioGroupProps, "children">>(({ classNames = {}, ...props }, ref) => (
-	<RadioGroup
-		ref={ref}
-		aria-label="Select a theme"
-		classNames={{
-			...classNames,
-			wrapper: cn("gap-0 items-center", classNames?.wrapper),
-		}}
-		defaultValue="light"
-		orientation="horizontal"
-		{...props}>
-		<ThemeRadioItem icon="solar:moon-linear" value="dark" />
-		<ThemeRadioItem icon="solar:sun-2-linear" value="light" />
-		<ThemeRadioItem icon="solar:monitor-linear" value="system" />
-	</RadioGroup>
-));
+const ThemeSwitch = React.forwardRef<HTMLDivElement, Omit<RadioGroupProps, "children">>(({ classNames = {}, ...props }, ref) => {
+	const [mounted, setMounted] = React.useState(false);
+	const { theme, setTheme } = useTheme();
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) return null;
+	return (
+		<RadioGroup
+			ref={ref}
+			value={theme}
+			onValueChange={setTheme}
+			aria-label="Select a theme"
+			classNames={{
+				...classNames,
+				wrapper: cn("gap-0 items-center", classNames?.wrapper),
+			}}
+			orientation="horizontal"
+			{...props}>
+			<ThemeRadioItem icon="solar:moon-linear" value="dark" />
+			<ThemeRadioItem icon="solar:sun-2-linear" value="light" />
+			<ThemeRadioItem icon="solar:monitor-linear" value="system" />
+		</RadioGroup>
+	);
+});
 
 ThemeSwitch.displayName = "ThemeSwitch";
 

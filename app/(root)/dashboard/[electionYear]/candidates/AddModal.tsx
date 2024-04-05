@@ -42,7 +42,7 @@ export default function Component({ selectedElectionYear, isBlocked }) {
 	}, [searchParams.has("add")]);
 
 	return (
-		<Modal isOpen={searchParams.has("add") && !isBlocked} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
+		<Modal placement="center" isOpen={searchParams.has("add") && !isBlocked} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">Add Candidate</ModalHeader>
 				<ModalBody id="main" as="form" action={addcandidateHandler}>

@@ -32,7 +32,7 @@ export default function Component({ admin }) {
 		router.refresh();
 	}
 	return (
-		<Modal isOpen={searchParams.has("password")} onOpenChange={() => removeSearchParams({ password: "" }, router)}>
+		<Modal placement="center" isOpen={searchParams.has("password")} onOpenChange={() => removeSearchParams({ password: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">Set New Password</ModalHeader>
 				<ModalBody id="main" as="form" action={editAdminHandler}>

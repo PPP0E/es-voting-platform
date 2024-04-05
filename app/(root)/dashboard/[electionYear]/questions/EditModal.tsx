@@ -32,7 +32,7 @@ export default function Component({ question }) {
 		router.refresh();
 	}
 	return (
-		<Modal isOpen={searchParams.has("edit")} onOpenChange={() => removeSearchParams({ edit: "" }, router)}>
+		<Modal placement="center" isOpen={searchParams.has("edit")} onOpenChange={() => removeSearchParams({ edit: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">Edit Question</ModalHeader>
 				<ModalBody id="main" as="form" action={editQuestionHandler}>

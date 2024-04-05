@@ -37,7 +37,7 @@ export function AddElectionModal() {
 
 	//end time should be at least 1 minute after start time
 	return (
-		<Modal scrollBehavior="outside" isOpen={searchParams.has("add")} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
+		<Modal placement="center" scrollBehavior="outside" isOpen={searchParams.has("add")} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">Add New Election</ModalHeader>
 				<ModalBody>

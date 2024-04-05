@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
-import ManagementProfilePictureFrame from "./ManagementProfilePictureFrame";
+import ProfilePictureFrame from "./ProfilePictureFrame";
 import { cn } from "@/lib/cn";
 import Icon from "@/components/ui/Icon";
 import { addCandidateAnswers, editBio, editSlogan, editSocials, editVideo } from "./actions";
@@ -17,6 +17,7 @@ export function ProfileForm({ selectedCandidate }) {
 	const router = useRouter();
 
 	//state
+	const [profilePictureInput, setProfilePictureInput] = useState();
 	//personal state
 	const [isLoading, setIsLoading] = useState(false);
 	//video state
@@ -139,11 +140,6 @@ export function ProfileForm({ selectedCandidate }) {
 		</>
 	);
 
-	const types = [
-		{ key: "GIRL", value: "Head Girl" },
-		{ key: "BOY", value: "Head Boy" },
-	];
-
 	useEffect(() => {
 		if (!selectedCandidate) return;
 		setInstagram(selectedCandidate.instagram ?? "");
@@ -175,32 +171,9 @@ export function ProfileForm({ selectedCandidate }) {
 	return (
 		<>
 			<section className="flex max-w-5xl flex-col mx-auto items-center md:py-24 duration-300 px-4">
-				<div className={cn("p-2 flex flex-col gap-4 w-[500px]")}>
-					<Title title="Profile" description="This displays your public profile on the site.">
-						<Card className="bg-default-100" shadow="none">
-							<CardBody>
-								<div className="flex items-center gap-4">
-									<Badge
-										classNames={{ badge: "w-5 h-5" }}
-										content={
-											<Button isDisabled={!selectedCandidate.election.edit_photo} isIconOnly className="h-5 w-5 min-w-unit-5 bg-background p-0 text-default-500" radius="full" size="sm" variant="bordered">
-												<Icon className="h-[9px] w-[9px]" icon="solar:pen-linear" />
-											</Button>
-										}
-										placement="bottom-right"
-										shape="circle">
-										<Avatar className="h-16 w-16" src={`/api/users/${selectedCandidate.id}/avatar`} />
-									</Badge>
-									<div>
-										<p className="text-sm font-medium text-default-600">{selectedCandidate.officialName + " " + selectedCandidate.officialSurname}</p>
-										<p className="text-xs mt-1 text-default-400">{types.find((t) => t.key == selectedCandidate.type).value} Candidate</p>
-										<p className="text-xs text-default-400">
-											{selectedCandidate.student_id} • @{selectedCandidate.slug}
-										</p>
-									</div>
-								</div>
-							</CardBody>
-						</Card>
+				<div className={cn("p-2 flex flex-col gap-4 md:w-[500px]")}>
+					<Title title="Profile Picture">
+						<ProfilePictureFrame isDisabled={!selectedCandidate.election.edit_photo} candidate={selectedCandidate} />
 					</Title>
 					<div className="flex flex-col gap-2 bg-content1/40 border rounded-2xl p-3">
 						<div className="my-2">
@@ -268,7 +241,7 @@ export function ProfileForm({ selectedCandidate }) {
 									const answer = selectedCandidate.Answer.find((answer) => answer?.question?.id === question?.id);
 									return (
 										<li key={question?.id}>
-											<Textarea defaultValue={answer?.content} description="500 words max" name={question?.id} label={question.title} />
+											<Textarea isDisabled={!selectedCandidate.election.edit_questions} defaultValue={answer?.content} description="500 words max" name={question?.id} label={question.title} />
 										</li>
 									);
 								})}

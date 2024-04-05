@@ -31,7 +31,7 @@ export default function Component() {
 	}
 
 	return (
-		<Modal isOpen={searchParams.has("delete") && searchParams.get("edit") !== ""} onOpenChange={() => removeSearchParams({ delete: "" }, router)}>
+		<Modal placement="center" isOpen={searchParams.has("delete") && searchParams.get("edit") !== ""} onOpenChange={() => removeSearchParams({ delete: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">Delete Candidate</ModalHeader>
 				<ModalBody>Are you sure you want to delete this candidate?</ModalBody>

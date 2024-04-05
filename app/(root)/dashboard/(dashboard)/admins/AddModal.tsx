@@ -31,7 +31,7 @@ export default function Component() {
 	}
 
 	return (
-		<Modal isOpen={searchParams.has("add")} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
+		<Modal placement="center" isOpen={searchParams.has("add")} onOpenChange={() => removeSearchParams({ add: "" }, router)}>
 			<ModalContent>
 				<ModalHeader className="flex flex-col gap-1">Add an Admin</ModalHeader>
 				<ModalBody id="main" as="form" action={addAdminHandler}>
