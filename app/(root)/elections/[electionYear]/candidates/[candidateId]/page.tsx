@@ -14,8 +14,24 @@ import ViewCounter from "./ViewCounter";
 import { auth } from "@/auth";
 import BackButton from "./BackButton";
 
-export default async function Component({ params }) {
-	const session = await auth();
+export async function generateMetadata({ params }) {
+	const candidate = await getData(params);
+	const fullName = `${candidate.officialName} ${candidate.officialSurname}`;
+	const title = `${fullName} - ${candidate.election.election_year} Elections Candidate`;
+	const description = candidate.slogan || `Head ${candidate.type.toLowerCase()} candidate for the ${candidate.election.election_year} student elections of The English School.`;
+	const image = `/api/users/${candidate.id}/avatar`;
+	return {
+		metadataBase: new URL("https://eselections.org"),
+		title,
+		description,
+		image,
+		openGraph: {
+			images: `/api/users/${candidate.id}/avatar`,
+		},
+	};
+}
+
+async function getData(params) {
 	let candidate;
 	try {
 		candidate = await prisma.candidate.findFirst({
@@ -48,6 +64,12 @@ export default async function Component({ params }) {
 	if (!candidate) {
 		redirect(`/elections/${params.electionYear}`);
 	}
+	return candidate;
+}
+
+export default async function Component({ params }) {
+	const session = await auth();
+	const candidate = await getData(params);
 	if (!session?.user?.admin && !session?.user?.candidate) {
 		try {
 			await prisma.candidate.update({

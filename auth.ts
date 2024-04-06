@@ -13,7 +13,7 @@ function isEmptyObject(obj) {
 export const authConfig: NextAuthConfig = {
 	session: {
 		strategy: "jwt",
-		maxAge: 60 * 60 * 2,
+		maxAge: 60 * 60 * 24 * 7,
 	},
 	providers: [
 		CredentialsProvider({

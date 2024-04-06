@@ -15,7 +15,12 @@ import PwaNavbar from "./PwaNavbar";
 import TopFl, { BottomFl } from "./flprovider";
 
 export const metadata = {
+	metadataBase: new URL("https://eselections.org"),
 	title: "The English School Student Elections",
+	description: "The official website for The English School student elections.",
+	openGraph: {
+		images: "/assets/og.jpg",
+	},
 };
 
 export const runtime = "nodejs";
