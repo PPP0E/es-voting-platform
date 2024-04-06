@@ -5,6 +5,15 @@ import prisma from "@/prisma/client";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+	metadataBase: new URL("https://eselections.org"),
+	title: "Manage Elections - The English School",
+	description: "Manage the student elections of The English School.",
+	openGraph: {
+		images: "/assets/og-image.jpg",
+	},
+};
+
 export default async function Component({ children }) {
 	return (
 		<main className="mt-6 flex w-full flex-col items-center">

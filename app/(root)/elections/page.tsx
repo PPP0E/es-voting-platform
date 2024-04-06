@@ -8,6 +8,15 @@ import groupIcon from "@iconify/icons-solar/users-group-two-rounded-linear";
 
 export const revalidate = 60; // 1 minute
 
+export const metadata = {
+	metadataBase: new URL("https://eselections.org"),
+	title: "Explore All Elections - The English School Student Elections",
+	description: "Explore all past, current and future student elections of The English School.",
+	openGraph: {
+		images: "/assets/og-image.jpg",
+	},
+};
+
 function formatDate(dateString) {
 	const date = new Date(dateString);
 	//day first

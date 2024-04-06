@@ -17,7 +17,7 @@ import BackButton from "./BackButton";
 export async function generateMetadata({ params }) {
 	const candidate = await getData(params);
 	const fullName = `${candidate.officialName} ${candidate.officialSurname}`;
-	const title = `${fullName} - ${candidate.election.election_year} Elections Candidate`;
+	const title = `${fullName} - ${candidate.election.election_year} Student Elections Candidate - The English School`;
 	const description = candidate.slogan || `Head ${candidate.type.toLowerCase()} candidate for the ${candidate.election.election_year} student elections of The English School.`;
 	const image = `/api/users/${candidate.id}/avatar`;
 	return {

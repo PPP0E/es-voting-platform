@@ -9,6 +9,15 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+	metadataBase: new URL("https://eselections.org"),
+	title: "Manage Elections - The English School",
+	description: "Manage the student elections of The English School.",
+	openGraph: {
+		images: "/assets/og-image.jpg",
+	},
+};
+
 export default async function Component({ children, params }) {
 	const selectedElection = await prisma.election.findFirst({
 		where: {
