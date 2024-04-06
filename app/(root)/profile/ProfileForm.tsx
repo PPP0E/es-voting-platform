@@ -171,7 +171,7 @@ export function ProfileForm({ selectedCandidate }) {
 	return (
 		<>
 			<section className="flex max-w-5xl flex-col mx-auto my-4 items-center md:py-24 duration-300 px-4">
-				<div className={cn("p-2 flex flex-col gap-4 md:w-[500px]")}>
+				<div className={cn("p-2 flex flex-col gap-4 md:w-[750px]")}>
 					<Title title="Profile Picture">
 						<ProfilePictureFrame isDisabled={!selectedCandidate.election.edit_photo} candidate={selectedCandidate} />
 					</Title>
@@ -241,7 +241,18 @@ export function ProfileForm({ selectedCandidate }) {
 									const answer = selectedCandidate.Answer.find((answer) => answer?.question?.id === question?.id);
 									return (
 										<li key={question?.id}>
-											<Textarea isDisabled={!selectedCandidate.election.edit_questions} defaultValue={answer?.content} description="Max 100,000 characters" maxLength={100000} name={question?.id} label={question.title} />
+											<Textarea
+												classNames={{
+													input: "resize-y min-h-[400px]",
+												}}
+												disableAutosize
+												isDisabled={!selectedCandidate.election.edit_questions}
+												defaultValue={answer?.content}
+												description="Max 100,000 characters"
+												maxLength={100000}
+												name={question?.id}
+												label={question.title}
+											/>
 										</li>
 									);
 								})}
