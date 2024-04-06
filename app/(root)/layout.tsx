@@ -19,7 +19,7 @@ export const metadata = {
 	title: "The English School Student Elections",
 	description: "The official website for The English School student elections.",
 	openGraph: {
-		images: "/assets/og.jpg",
+		images: "/assets/og-image.jpg",
 	},
 };
 
