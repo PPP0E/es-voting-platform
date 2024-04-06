@@ -47,7 +47,7 @@ export function QuestionsModal({ questions, selectedElection, candidate, answers
 									const answer = answers.find((answer) => answer.question.id === question.id);
 									return (
 										<li key={question.id}>
-											<Textarea defaultValue={answer?.content} description="500 words max" name={question.id} label={question.title} />
+											<Textarea defaultValue={answer?.content} name={question.id} label={question.title} />
 										</li>
 									);
 								})}

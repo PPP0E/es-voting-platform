@@ -67,25 +67,26 @@ const socialItems = [
 
 export default function Component() {
 	const currentYear = new Date().getFullYear();
-
+	/* 
 	const [height, setHeight] = React.useState("264px");
 
 	React.useEffect(() => {
 		const footer = document.getElementById("footer");
 		setHeight(footer.clientHeight + "px");
-	}, []);
+	}, []); */
 
 	return (
 		<>
 			<ThemeSwitch className="bottom-2 bg-content1/60 border rounded-full p-[2px] z-[2] right-2 fixed" />
-			<div style={{ height: height }} className="p-3 w-full pwa:hidden opacity-0 absolute"></div>
-			<footer id="footer" className="p-3 fixed pwa:hidden w-full z-[-2] bottom-0">
+			{/* 			<div style={{ height: height }} className="p-3 w-full pwa:hidden opacity-0 absolute"></div>
+			 */}{" "}
+			<footer id="footer" className="p-3 pwa:hidden w-full z-[-2] dark:bg-black bottom-0">
 				<div className="flex w-full flex-col">
 					<div className="mx-auto flex w-full max-w-7xl rounded-xl flex-col items-center justify-center px-6 py-12 lg:px-8">
 						<div className="flex items-center justify-center">
 							<Link href="/">
 								<Image src={ESLogoWhite} alt="The English School Logo" className="hidden dark:block" width={200} />
-								<Image src={ESLogoBlack} alt="The English School Logo" className="dark:hidden" width={200} />{" "}
+								<Image src={ESLogoBlack} alt="The English School Logo" className="dark:hidden" width={200} />
 							</Link>
 						</div>
 						<Spacer y={4} />

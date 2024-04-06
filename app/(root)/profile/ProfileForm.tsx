@@ -241,7 +241,7 @@ export function ProfileForm({ selectedCandidate }) {
 									const answer = selectedCandidate.Answer.find((answer) => answer?.question?.id === question?.id);
 									return (
 										<li key={question?.id}>
-											<Textarea isDisabled={!selectedCandidate.election.edit_questions} defaultValue={answer?.content} description="500 words max" name={question?.id} label={question.title} />
+											<Textarea isDisabled={!selectedCandidate.election.edit_questions} defaultValue={answer?.content} description="Max 100,000 characters" maxLength={100000} name={question?.id} label={question.title} />
 										</li>
 									);
 								})}
