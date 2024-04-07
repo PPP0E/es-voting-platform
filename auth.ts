@@ -150,7 +150,7 @@ export const authConfig: NextAuthConfig = {
 
 				const user = { ...userObject, ...userAttributes };
 				if (!user || isEmptyObject(user)) return null;
-				console.log(user);
+				console.log(user?.fullName);
 				return user;
 			},
 		}),
