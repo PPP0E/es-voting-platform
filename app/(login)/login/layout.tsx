@@ -10,7 +10,12 @@ const inter = Inter({ subsets: ["latin"] });
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-	title: "The English School Student Elections",
+	metadataBase: new URL("https://eselections.org"),
+	title: "Login - The English School Student Elections",
+	description: "The official website for The English School student elections.",
+	openGraph: {
+		images: "/assets/og-image.jpg",
+	},
 };
 
 export default function RootLayout({ children }) {

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button, Input, Checkbox, Divider, Chip, Link } from "@nextui-org/react";
+import { Button, Input, Checkbox, Divider, Chip, Link, Spacer } from "@nextui-org/react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import ESLogo from "@/public/assets/branding/logos/es-logo.svg";
@@ -70,8 +70,12 @@ export default function Component() {
 			</div>*/}
 
 			{/* Login Form */}
-			<div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1/80 px-8 pb-10 pt-6 shadow-small">
-				<p className="pb-2 text-xl font-medium">Login</p>
+			<div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1/90 px-8 pb-10 pt-6 shadow-small">
+				<div>
+					<p className="text-xl font-medium">Login</p>
+					<Spacer y={1} />
+					<p className="text-sm font-medium">All students in years 3 to 6 can log in with their School (Microsoft) Accounts.</p>
+				</div>
 				<form className="flex flex-col gap-3" action={loginHandler}>
 					<Input className="" size="lg" label="Email Address or Student ID" color="success" name="username" type="text" variant="" />
 					<Input
