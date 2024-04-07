@@ -56,7 +56,7 @@ export default async function RootLayout({ children }) {
 					<NextUIProvider>
 						<Navbar faqsCount={faqs} currentElection={currentElection} />
 						<PwaNavbar />
-						<main className="flex min-h-screen w-screen overflow-x-hidden dark:bg-black bg-white flex-col items-center justify-between">
+						<main className="flex min-h-screen max-w-screen overflow-x-hidden w-screen dark:bg-black bg-white flex-col items-center justify-between">
 							<TopFl />
 							<BottomFl />
 							<div className="dark:bg-dot-white/25 bg-dot-black/25 z-[2] min-h-screen w-full rounded-b-[20px]">

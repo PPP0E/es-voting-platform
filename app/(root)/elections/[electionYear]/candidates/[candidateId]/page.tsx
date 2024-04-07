@@ -89,7 +89,7 @@ export default async function Component({ params }) {
 	return (
 		<>
 			<BackButton />
-			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto  py-24 px-4">
+			<section className="flex pwa:hidden max-w-5xl flex-col mx-auto  py-24">
 				<div className="flex max-w-xl flex-col text-center mx-auto items-center">
 					<Avatar showFallback className="h-40 w-40 mx-auto" isBordered src={`/api/users/${candidate.id}/avatar`} />
 					<Spacer y={4} />
