@@ -9,7 +9,7 @@ export function IncreasingStat({ value }) {
 		if (value === 0) return;
 
 		let start = Date.now();
-		const totalTime = 2000; // Total animation time in ms
+		const totalTime = 500; // Total animation time in ms
 
 		const updateCount = () => {
 			const elapsed = Date.now() - start;
@@ -21,18 +21,14 @@ export function IncreasingStat({ value }) {
 				requestAnimationFrame(updateCount);
 			}
 		};
-
 		requestAnimationFrame(updateCount);
-
-		return () => {
-			// Cleanup might involve canceling the animation frame if necessary
-		};
 	}, [value]);
 
 	return (
 		<p className="bg-gradient-to-br ml-auto my-auto from-foreground-800 to-foreground-500 bg-clip-text text-2xl font-semibold tracking-tight text-transparent dark:to-foreground-200">
 			{count}
-			<span className="font-[300] text-sm"> views</span>
+			{/* 			<span className="font-[300] text-sm"> views</span>
+			 */}
 		</p>
 	);
 }
