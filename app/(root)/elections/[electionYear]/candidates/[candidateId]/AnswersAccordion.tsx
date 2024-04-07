@@ -25,7 +25,7 @@ export function ProfileTabs({ candidate }) {
 					radius="lg"
 					variant="light">
 					{candidate.bio && <Tab key="about" title="About Me" />}
-					{!!candidate.Answer.length && <Tab key="questions" title="Questions" />}
+					{!!candidate.Answer.length && <Tab key="questions" title="Application" />}
 					{candidate.video_url && <Tab key="video" title="Video" />}
 					{candidate.speech_url && <Tab key="speech" title="Speech" />}
 					{displaySocials && <Tab key="social" title="Social Media" />}
