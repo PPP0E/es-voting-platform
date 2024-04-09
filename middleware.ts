@@ -38,8 +38,7 @@ export default auth((req) => {
 	const isAuthenticated = !!req.auth;
 
 	if (nextUrl.pathname.includes("%23")) {
-		const newUrl = nextUrl.pathname.replace("%23", "#");
-		console.log(newUrl);
+		let newUrl = nextUrl.pathname.replace("%23", "#");
 		return NextResponse.redirect(new URL(newUrl, nextUrl.origin));
 	}
 

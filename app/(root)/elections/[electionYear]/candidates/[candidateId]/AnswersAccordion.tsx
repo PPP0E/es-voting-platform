@@ -13,7 +13,9 @@ export function ProfileTabs({ candidate }) {
 
 	useEffect(() => {
 		console.log(window.location.hash);
-		setSelectedTab(window.location.hash.split("#")[1] || "about");
+		const hash = window.location.hash.substring(1);
+		const path = hash.split("?")[0];
+		setSelectedTab(path || "about");
 	}, []);
 
 	return (
