@@ -3,13 +3,19 @@
 import Icon from "@/components/ui/Icon";
 import { Accordion, AccordionItem, Button, Chip, Link, ScrollShadow, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InstagramLogo from "@/public/assets/social-media/instagram.png";
 import Image from "next/image";
 
 export function ProfileTabs({ candidate }) {
 	const [selectedTab, setSelectedTab] = useState("about");
 	const displaySocials = !!(candidate.instagram || candidate.facebook || candidate.twitter || candidate.snapchat || candidate.youtube || candidate.bereal || candidate.website);
+
+	useEffect(() => {
+		console.log("params", window.location.hash);
+		setSelectedTab(window.location.hash.split("#")[1] || "about");
+	}, []);
+
 	return (
 		<div className="flex flex-col overflow-hidden justify-start">
 			<ScrollShadow hideScrollBar className="flex max-w-full overflow-x-scroll flex-col justify-between gap-8" orientation="horizontal">

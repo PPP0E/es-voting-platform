@@ -52,7 +52,7 @@ export default function Component({ faqsCount, currentElection }) {
 					</Link>
 					<Spacer x={2} />
 					<Icon icon="solar:alt-arrow-right-linear" className="my-auto mr-1 hidden md:block" width={24} />
-					<p className="hidden md:block">Student Elections</p>
+					<p className="hidden md:block">Elections</p>
 				</NavbarBrand>
 			</NavbarContent>
 
