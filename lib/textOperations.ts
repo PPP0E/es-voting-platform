@@ -1,5 +1,11 @@
 export const processSlogan = (text) => {
-	return capitalizeEachWord(text.replace(/\s+/g, " ").split(" ").slice(0, 10).join(" ").slice(0, 80)).replace(/(\b[i]\b)|(?<=[\.\?!]\s)i/g, "I");
+	return text
+		.replace(/\s+/g, " ")
+		.split(" ")
+		.slice(0, 10)
+		.join(" ")
+		.slice(0, 80)
+		.replace(/(\b[i]\b)|(?<=[\.\?!]\s)i/g, "I");
 };
 
 export const processBio = (text) => {
