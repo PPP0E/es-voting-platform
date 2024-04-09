@@ -37,6 +37,12 @@ export default auth((req) => {
 	const { nextUrl } = req;
 	const isAuthenticated = !!req.auth;
 
+	if (nextUrl.pathname.includes("%23")) {
+		const newUrl = nextUrl.pathname.replace("%23", "#");
+		console.log(newUrl);
+		return NextResponse.redirect(new URL(newUrl, nextUrl.origin));
+	}
+
 	if (nextUrl.pathname.includes("@")) {
 		const year = nextUrl.pathname.split("/")[1];
 		const username = nextUrl.pathname.split("/")[2].replace("@", "");

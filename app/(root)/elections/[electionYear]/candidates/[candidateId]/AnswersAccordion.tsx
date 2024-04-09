@@ -12,7 +12,7 @@ export function ProfileTabs({ candidate }) {
 	const displaySocials = !!(candidate.instagram || candidate.facebook || candidate.twitter || candidate.snapchat || candidate.youtube || candidate.bereal || candidate.website);
 
 	useEffect(() => {
-		console.log("params", window.location.hash);
+		console.log(window.location.hash);
 		setSelectedTab(window.location.hash.split("#")[1] || "about");
 	}, []);
 
